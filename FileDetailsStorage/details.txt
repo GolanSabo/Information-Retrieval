@@ -1,0 +1,3 @@
+0;Golan;.\SourceFolder\Golan.txt;Golan;Golan;Golan;12/12/1999;.txt;true;
+1;Tal;.\SourceFolder\Tal.txt;Golan;Golan;Golan;12/12/1999;.txt;true;
+2;Tal2;.\SourceFolder\Tal2.txt;Golan;Golan;Golan;12/12/1999;.txt;true;

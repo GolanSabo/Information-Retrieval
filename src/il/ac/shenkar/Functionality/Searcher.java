@@ -275,7 +275,8 @@ public class Searcher {
 				}
 			}
 			if(!match){
-				result.add(new SearchResult(tmp.getFileDetails(), tmp.getLocations()));
+				if(tmp.getFileDetails().isActive())
+					result.add(new SearchResult(tmp.getFileDetails(), tmp.getLocations()));
 			}
 		}
 		System.out.println("Before sorting \n" + result);

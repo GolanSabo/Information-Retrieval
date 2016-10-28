@@ -3,11 +3,15 @@ package il.ac.shenkar.FileParser;
 import il.ac.shenkar.Details.FileDetails;
 import il.ac.shenkar.Details.Node;
 import il.ac.shenkar.Utils.FileUtils;
+import il.ac.shenkar.Utils.StopList;
 
 import java.io.BufferedReader;
+import java.io.DataInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.DateFormat;
@@ -43,33 +47,40 @@ public class FileParser {
 		FileDetails fileDetails = getFileDetailsFromDataBase(file);
 		Node node;
 		try {
-			parseDetails(fileDetails.getName(), fileDetails, -2);
-			parseDetails(fileDetails.getDescription(), fileDetails, -3);
-			parseDetails(fileDetails.getAuthor(), fileDetails, -4);
+			parse(fileDetails.getName(), fileDetails, -2);
+			parse(fileDetails.getDescription(), fileDetails, -3);
+			parse(fileDetails.getAuthor(), fileDetails, -4);
 			DateFormat sdf = new SimpleDateFormat("dd/mm/yy");
-			parseDetails(sdf.format(fileDetails.getDate()), fileDetails, -5);
-			scanner = new Scanner(file);
-			/*scan a file word by word and add it to a hashmap with word as key and file data as value */
-			while(scanner.hasNext()){
-				String word = scanner.next().replaceAll("[-+.^:;,\'\"\\()?!“”‘’— ]*","");
-				word = word.toLowerCase();
-				if(invertedFile.containsKey(word)){
-					node = invertedFile.get(word);
-				}
-				else{
-					node = new Node(fileDetails);
-				}
-				//save word location in file
-				node.AddLocation(counter);
-				invertedFile.put(word, node);
-				++counter;
-			}
+			parse(sdf.format(fileDetails.getDate()), fileDetails, -5);
+			BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
+			StringBuilder sb = new StringBuilder();
+			String tmp;
+			while((tmp = bufferedReader.readLine()) != null)
+				sb.append(tmp);
+			parse(sb.toString(),fileDetails,0);
+//			scanner = new Scanner(file);
+//			/*scan a file word by word and add it to a hashmap with word as key and file data as value */
+//			while(scanner.hasNext()){
+//				String word = scanner.next().replaceAll("[-+.^:;,\'\"\\()?!“”‘’— ]*","");
+//				word = word.toLowerCase();
+//				if(invertedFile.containsKey(word)){
+//					node = invertedFile.get(word);
+//				}
+//				else{
+//					node = new Node(fileDetails);
+//				}
+//				//save word location in file
+//				node.AddLocation(counter);
+//				invertedFile.put(word, node);
+//				++counter;
+//			}
 //			PrinterUtils.PrintMap(invertedFile);
 			//after the file have been fully parsed -> save temporary inverted file and copy it to storage folder 
 			FileUtils.SaveToFile(invertedFile, fileDetails.getDocumentName(), InvertedFileFolderPath);
 			if(FileUtils.CopyFile(file, storageFolderPath))
 			{
-				scanner.close();
+//				scanner.close();
+				bufferedReader.close();
 				file.delete();
 			}
 
@@ -78,7 +89,7 @@ public class FileParser {
 		}
 	}
 	
-	private static void parseDetails(String text, FileDetails fileDetails, int location){
+	private static void parse(String text, FileDetails fileDetails, int location){
 		if(text == null)
 			return;
 		Scanner scanner = new Scanner(text);
@@ -87,6 +98,11 @@ public class FileParser {
 		while(scanner.hasNext()){
 			String word = scanner.next().replaceAll("[-+.^:;,\'\"\\()?!“”‘’— ]*","");
 			word = word.toLowerCase();
+			if(StopList.stopList.contains(word)){
+				if(location >= 0)
+					++location;
+				continue;
+			}
 			if(invertedFile.containsKey(word)){
 				node = invertedFile.get(word);
 			}
@@ -95,6 +111,8 @@ public class FileParser {
 			}
 			//save word location in file
 			node.AddLocation(location);
+			if(location >= 0)
+				++location;
 			invertedFile.put(word, node);
 		}
 	}

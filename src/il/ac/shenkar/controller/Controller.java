@@ -13,12 +13,14 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Vector;
 
 import javax.swing.text.DefaultEditorKit.CopyAction;
 
 import il.ac.shenkar.Details.FileDetails;
 import il.ac.shenkar.Details.Node;
+import il.ac.shenkar.FileMonitor.FileMonitor;
 import il.ac.shenkar.Functionality.SearchResult;
 import il.ac.shenkar.Functionality.Searcher;
 import il.ac.shenkar.Utils.FileUtils;
@@ -27,15 +29,55 @@ import il.ac.shenkar.errors.NoResultsException;
 import il.ac.shenkar.view.Link;
 import il.ac.shenkar.view.MainView;
 
+
 public class Controller 
 {
+	public enum ResultType {DOCUMENT, IMAGE, SOUND};
+	private  final String sourceFolderPath = "./SourceFolder";
+	private  final String storageFolderPath = "./StorageFolder";
+	private  final String fileDetailsPath = "./FileDetailsStorage/details.txt";
+	private final ArrayList<String> documentExtension = 
+			new ArrayList<String>(Arrays.asList("txt","doc","pdf"));
+	private final ArrayList<String> imageExtension = 
+			new ArrayList<String>(Arrays.asList("png","jpg","bmp", "gif"));
+	private final ArrayList<String> soundExtension = 
+			new ArrayList<String>(Arrays.asList("wav","mp3"));
+	private  ArrayList<FileDetails> filesInfo = new ArrayList<FileDetails>();
+	private MainView view;
+	private FileMonitor fileMonitor;
+	private static Controller _instance = null;
 	
-	private static final String sourceFolderPath = "./SourceFolder";
-	private static final String storageFolderPath = "./StorageFolder";
-	private static final String fileDetailsPath = "./FileDetailsStorage/details.txt";
-	private static ArrayList<FileDetails> filesInfo = new ArrayList<FileDetails>();
+	private Controller(){}
 	
-	public static Vector<String> getDocumentsNames() 
+	
+	public static Controller getInstance()
+	{
+		if(_instance==null)
+			_instance = new Controller();
+		return _instance;
+	}
+	
+	public MainView getView() {
+		return view;
+	}
+
+
+	public void setView(MainView view) {
+		this.view = view;
+	}
+
+
+	public FileMonitor getFileMonitor() {
+		return fileMonitor;
+	}
+
+
+	public void setFileMonitor(FileMonitor fileMonitor) {
+		this.fileMonitor = fileMonitor;
+	}
+
+
+	public  Vector<String> getDocumentsNames() 
 	{
 		
 		Vector<String> names = new Vector<>();
@@ -46,7 +88,17 @@ public class Controller
 	    }
 	    return names;
 	}
-	public static void storeInDatabase(String filePath, String docName, String _author
+	
+	private ResultType getResultType(String ext)
+	{
+		if(documentExtension.contains(ext))
+			return ResultType.DOCUMENT;
+		else if(imageExtension.contains(ext))
+			return ResultType.IMAGE;
+		else return ResultType.DOCUMENT;
+	}
+	
+	public  void storeInDatabase(String filePath, String docName, String _author
 			,String _subject, String _description, String _date) throws IOException, DuplicateNameException
 	{
 		Path src = Paths.get(filePath);
@@ -67,7 +119,7 @@ public class Controller
 	}
 	
 	
-	private static void checkDocumentsIfNameExists(String docName) throws DuplicateNameException
+	private  void checkDocumentsIfNameExists(String docName) throws DuplicateNameException
 	{
 		for(FileDetails file: filesInfo)
 		{
@@ -78,7 +130,7 @@ public class Controller
 		}
 		
 	}
-	public static void loadFileDetailsFromDatabase() 
+	public  void loadFileDetailsFromDatabase() 
 	{
 		BufferedReader br = null;
 		String line = null;
@@ -121,7 +173,7 @@ public class Controller
 	
 		
 	}
-	private static void saveFileDetails(FileDetails newFile) 
+	private  void saveFileDetails(FileDetails newFile) 
 	{
 		StringBuilder details = new StringBuilder(newFile.toString());
 		BufferedWriter bw = null;
@@ -162,7 +214,7 @@ public class Controller
 		
 		
 	}
-	public static Vector<Link> getResults(String query) throws NoResultsException
+	public  Vector<Link> getResults(String query) throws NoResultsException
 	{
 		
 		Vector<Link> links=null;
@@ -177,8 +229,9 @@ public class Controller
 				result.getFileDetails().setPath(storageFolderPath + "/" + 
 			result.getFileDetails().getDocumentName() + result.getFileDetails().getExtension());
 				FileDetails temp = result.getFileDetails();
+				ResultType type = getResultType(temp.getExtension());
 				links.addElement(new Link(temp.getPath(),temp.getDocumentName(),temp.getDescription()
-						,query, result.getLocations()));	
+						,query, result.getLocations(),type));	
 			}
 			
 			
@@ -191,23 +244,14 @@ public class Controller
 		return links;
 	
 	}
-	/*
-	public FileDetails getFileDetailsFromDataBase(File file)
-	{
-		for(FileDetails temp: filesInfo)
-		{
-			if (temp.getPath()==file.getAbsolutePath())
-				return temp;
-		}
-		return null;
-	}*/
 	
-	private static String getExtension(String _path) {
+	
+	private  String getExtension(String _path) {
 		int pos = _path.lastIndexOf(".");
 		if (pos == -1) return _path;
 		return _path.substring(pos,_path.length());
 	}
-	public static void changeVisibility(String docName, boolean isActive) 
+	public  void changeVisibility(String docName, boolean isActive) 
 	{
 		File details = new File(fileDetailsPath);
 		details.delete();
@@ -223,6 +267,27 @@ public class Controller
 		}
 		temp.setActive(isActive);
 		
+	}
+	public void setBatch(String str)
+	{
+		long time = 0;
+		if(str.equals("20 seconds"))
+			time = 20*1000;
+		else if(str.equals("5 minutes"))
+			time = 5*60*1000;
+		else if(str.equals("20 minutes"))
+			time = 20*60*1000;
+		else if(str.equals("1 hour"))
+			time = 60*60*1000;
+		else if(str.equals("24 hours"))
+			time = 24*60*60*1000;
+		fileMonitor.setBatchTime(time);
+	}
+	public void init()
+	{
+		fileMonitor = new FileMonitor(20 * 1000);
+		fileMonitor.start();
+		loadFileDetailsFromDatabase();
 	}
 	
 	

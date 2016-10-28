@@ -41,10 +41,10 @@ public class MainView extends JFrame implements ActionListener
 	private JPanel container;
 	private JList list;
 	private JPanel queryPanel;
+	
 	public MainView()
 	{
-		
-		
+		Controller.getInstance().init();
 		input = new JTextField(20);
 		search = new JButton();
 		search.setIcon(new ImageIcon("Search.png"));
@@ -64,6 +64,7 @@ public class MainView extends JFrame implements ActionListener
         
 		
 	}
+	
 	
 	public void createMainView()
 	{
@@ -142,7 +143,7 @@ public void addComponentToPane(Container pane) {
 		if( event.getSource()==search || event.getSource()==input)
 		{
 			try {
-				links = Controller.getResults(input.getText());
+				links = Controller.getInstance().getResults(input.getText());
 			} catch (NoResultsException e) {
 				JOptionPane.showMessageDialog(this,"Search returned no results\n"
 						, "No results",JOptionPane.ERROR_MESSAGE);

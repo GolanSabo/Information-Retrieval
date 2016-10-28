@@ -10,6 +10,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Scanner;
 
@@ -21,10 +23,15 @@ import java.util.Scanner;
  */
 public class FileParser {
 
+	public static final int NameLocation = -2;
+	public static final int DescriptionLocation = -3;
+	public static final int AuthourLocation = -4;
+	public static final int DateLocation = -5;
+	
 	private final static String storageFolderPath = "./StorageFolder/";
 	private final static String InvertedFileFolderPath = "./InvertedFile";
 	private static final String fileDetailsPath = "./FileDetailsStorage/details.txt";
-
+	private static HashMap<String,Node> invertedFile = new HashMap<String, Node>();
 	/**
 	 * Parse file into a temporary inverted file and passes it to InvertedFile folder
 	 * @param file
@@ -32,10 +39,15 @@ public class FileParser {
 	public static void Parse(File file){
 		int counter = 0;
 		Scanner scanner;
-		HashMap<String,Node> invertedFile = new HashMap<String, Node>();
+		invertedFile = new HashMap<String, Node>();
 		FileDetails fileDetails = getFileDetailsFromDataBase(file);
 		Node node;
 		try {
+			parseDetails(fileDetails.getName(), fileDetails, -2);
+			parseDetails(fileDetails.getDescription(), fileDetails, -3);
+			parseDetails(fileDetails.getAuthor(), fileDetails, -4);
+			DateFormat sdf = new SimpleDateFormat("dd/mm/yy");
+			parseDetails(sdf.format(fileDetails.getDate()), fileDetails, -5);
 			scanner = new Scanner(file);
 			/*scan a file word by word and add it to a hashmap with word as key and file data as value */
 			while(scanner.hasNext()){
@@ -65,6 +77,28 @@ public class FileParser {
 			e.printStackTrace();
 		}
 	}
+	
+	private static void parseDetails(String text, FileDetails fileDetails, int location){
+		if(text == null)
+			return;
+		Scanner scanner = new Scanner(text);
+		Node node;
+		/*scan a file word by word and add it to a hashmap with word as key and file data as value */
+		while(scanner.hasNext()){
+			String word = scanner.next().replaceAll("[-+.^:;,\'\"\\()?!“”‘’— ]*","");
+			word = word.toLowerCase();
+			if(invertedFile.containsKey(word)){
+				node = invertedFile.get(word);
+			}
+			else{
+				node = new Node(fileDetails);
+			}
+			//save word location in file
+			node.AddLocation(location);
+			invertedFile.put(word, node);
+		}
+	}
+	
 	private static FileDetails getFileDetailsFromDataBase(File file) 
 	{
 		FileDetails temp = null;
@@ -113,6 +147,8 @@ public class FileParser {
 		
 		return null;
 	}
+	
+	
 
 
 }

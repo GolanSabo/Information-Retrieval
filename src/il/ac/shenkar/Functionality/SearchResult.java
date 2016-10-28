@@ -4,7 +4,7 @@ import il.ac.shenkar.Details.FileDetails;
 
 import java.util.ArrayList;
 
-public class SearchResult {
+public class SearchResult implements Comparable {
 	private FileDetails fileDetails;
 	private ArrayList<Integer> locations;
 	
@@ -39,9 +39,16 @@ public class SearchResult {
 	}
 
 	@Override
+	public int compareTo(Object o) {
+		int x = ((SearchResult)o).locations.size();
+
+		return x - locations.size();
+	}
+
+	@Override
 	public String toString() {
 		return "SearchResult [fileDetails=" + fileDetails + ", locations="
-				+ locations + "]";
+				+ locations + "]\n";
 	}
 	
 	

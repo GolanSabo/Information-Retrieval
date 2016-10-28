@@ -4,9 +4,8 @@ import il.ac.shenkar.Details.Node;
 import il.ac.shenkar.FileMonitor.FileMonitor;
 import il.ac.shenkar.Utils.FileUtils;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Stack;
@@ -15,8 +14,10 @@ public class Searcher {
 
 	private final static String fileName = "./conf/invertedFile.ser";
 	private static int nextWordIndex = 0;
+	private static Map invertedFile = FileUtils.LoadFromFile(fileName);
+	private static int notFlag = 0;
+
 	public static ArrayList<SearchResult> SearchWord(String query) throws Exception{
-		Map invertedFile = FileUtils.LoadFromFile(fileName);
 		query = query.toLowerCase();
 		while(FileMonitor.isActive()){
 			System.out.println("Wait for Batch Job To End");
@@ -39,7 +40,7 @@ public class Searcher {
 
 
 	private static ArrayList<Node> findList(String query) throws Exception{
-		Map invertedFile = FileUtils.LoadFromFile(fileName);
+
 		String[] words = query.split(" ");
 		ArrayList<Node> list = new ArrayList<Node>();
 		ArrayList<Node> tmp;
@@ -53,55 +54,101 @@ public class Searcher {
 				if(!checkNextWord(nextWord))
 					throw new Exception("invalid logical sentence");
 				if(words[i].startsWith("{") || words[i].startsWith("[") || words[i].startsWith("(")){
+					int x = notFlag;
+					notFlag = 0;
 					tmp = doParenthensies(query.substring(query.indexOf(words[i])));
-					String[] t = query.substring(query.indexOf(words[i]) + nextWordIndex + 1).split(" ");
-					i = words.length - t.length - 1;
+					notFlag = x;
+					int ind = query.indexOf(words[i]) + nextWordIndex + 1;
+					if(ind > query.length())
+						i = query.length();
+					else{
+						String[] t = query.substring(query.indexOf(words[i]) + nextWordIndex + 1).split(" ");
+						i = words.length - t.length - 1;
+					}
 				}
 				else
 					tmp = (ArrayList<Node>) invertedFile.get(nextWord);
-				count = matchLists(list,tmp,true);
-
-				for(int j = count.size() - 1 ; j >= 0; --j)
-					list.remove((int)count.get(j));
-
-				break;
-			case "or":
-				nextWord = words[++i];
-				if(!checkNextWord(nextWord))
-					throw new Exception("invalid logical sentence");
-				if(words[i].startsWith("{") || words[i].startsWith("[") || words[i].startsWith("(")){
-					tmp = doParenthensies(query.substring(query.indexOf(words[i])));
-					String[] t = query.substring(query.indexOf(words[i]) + nextWordIndex + 1).split(" ");
-					i = words.length - t.length - 1;
-				}
-				else
+				if(notFlag % 2 == 1){
+					nextWord = words[++i];
 					tmp = (ArrayList<Node>) invertedFile.get(nextWord);
-				count = matchLists(list,tmp,false);
+					tmp = logicalNot(tmp,invertedFile);
+					notFlag = 0;
+				}
+				count = matchLists(list,tmp);
 
-				for(int j = 0 ; j < count.size(); ++j)
-					list.add(tmp.get(count.get(j)));
+				for(int j = count.size() - 1 ; j >= 0; --j){
+					for(int k = 0; k < tmp.size(); ++k)
+						if(tmp.get(k).getFileIndex() == count.get(j))
+							tmp.remove(k);
+					for(int k = 0; k < list.size(); ++k)
+						if(list.get(k).getFileIndex() == count.get(j))
+							list.remove(k);
+				}
+				for(int j = 0; j < tmp.size(); ++j)
+					list.add(tmp.get(j));
+
 				break;
 			case "not":
+				notFlag++;
 				nextWord = words[++i];
 				if(!checkNextWord(nextWord))
 					throw new Exception("invalid logical sentence");
 				if(words[i].startsWith("{") || words[i].startsWith("[") || words[i].startsWith("(")){
+					int x = notFlag;
+					notFlag = 0;
 					tmp = doParenthensies(query.substring(query.indexOf(words[i])));
-					String[] t = query.substring(query.indexOf(words[i]) + nextWordIndex + 1).split(" ");
-					i = words.length - t.length - 1;
+					notFlag = x;
+					int ind = query.indexOf(words[i]) + nextWordIndex + 1;
+					if(ind > query.length())
+						i = query.length();
+					else{
+						String[] t = query.substring(query.indexOf(words[i]) + nextWordIndex + 1).split(" ");
+						i = words.length - t.length - 1;
+					}
 				}
 				else {
+					if(notFlag % 2 == 0){
+						nextWordIndex++;
+						notFlag = 0;
+						tmp = (ArrayList<Node>) invertedFile.get(words[i]);
+						list.addAll(tmp);
+						break;
+					}
 					tmp = (ArrayList<Node>) invertedFile.get(words[i]);
 				}
+
 				list.addAll(logicalNot(tmp,invertedFile));
 				break;
 			default:
-				tmp = (ArrayList<Node>) invertedFile.get(words[i]);
-				return tmp;
-				/*count = matchLists(list,tmp,false);
 
-				for(int j = 0 ; j < count.size(); ++j)
-					list.add(tmp.get(count.get(j)));*/
+				if(words[i].equals("or"))
+					nextWord = words[++i];
+				else
+					nextWord = words[i];
+				if(!checkNextWord(nextWord))
+					throw new Exception("invalid logical sentence");
+				if(words[i].startsWith("{") || words[i].startsWith("[") || words[i].startsWith("(")){
+					int x = notFlag;
+					notFlag = 0;
+					tmp = doParenthensies(query.substring(query.indexOf(words[i])));
+					notFlag = x;
+					int ind = query.indexOf(words[i]) + nextWordIndex + 1;
+					if(ind > query.length())
+						i = query.length();
+					else{
+						String[] t = query.substring(query.indexOf(words[i]) + nextWordIndex + 1).split(" ");
+						i = words.length - t.length - 1;
+					}
+				}
+				else
+					tmp = (ArrayList<Node>) invertedFile.get(nextWord);
+				if(notFlag % 2 == 1){
+					nextWord = words[++i];
+					tmp = (ArrayList<Node>) invertedFile.get(nextWord);
+					tmp = logicalNot(tmp,invertedFile);
+					notFlag = 0;
+				}
+				list.addAll(tmp);
 			}
 		}
 
@@ -119,14 +166,16 @@ public class Searcher {
 					fileList.remove((Object)n.getFileIndex());	
 			}
 		}
-
+		
 		Iterator itr = invertedFile.values().iterator();
 		ArrayList<Node> list = new ArrayList<>();
 		while(itr.hasNext()){
 			ArrayList<Node> n = (ArrayList<Node>)itr.next();
 			for(int i = 0; i < n.size(); ++i){
 				if(fileList.contains(n.get(i).getFileIndex())){
-					list.add(n.get(i));
+					Node t = new Node(n.get(i).getFileDetails());
+					t.AddLocation(-1);
+					list.add(t);
 				}
 			}
 		}
@@ -139,15 +188,16 @@ public class Searcher {
 			return false;
 		case "or":
 			return false;
+		case "not":
+			notFlag++;
+			return true;
 		default:
 			return true;	
 		}
 	}
 
-	private static ArrayList<Integer> matchLists(ArrayList<Node> list, ArrayList<Node> tmp, boolean isAnd){
+	private static ArrayList<Integer> matchLists(ArrayList<Node> list, ArrayList<Node> tmp){
 		ArrayList<Integer> count = new ArrayList<>();
-		if(tmp == null)
-			return count;
 
 		for(int j = 0; j < list.size(); ++j){
 			boolean match = false;
@@ -156,14 +206,9 @@ public class Searcher {
 				if(tmp.get(k).getFileIndex() == fileIndex){
 					match = true;
 				}
-				else{
-					if(!isAnd && j == 0)
-						count.add(k);
-				}
 			}
-			if(isAnd)
-				if(!match)
-					count.add(j);
+			if(!match)
+				count.add(fileIndex);
 
 		}
 		return count;
@@ -233,6 +278,11 @@ public class Searcher {
 				result.add(new SearchResult(tmp.getFileDetails(), tmp.getLocations()));
 			}
 		}
+		System.out.println("Before sorting \n" + result);
+		Collections.sort(result);
+		for(SearchResult s: result)
+			Collections.sort(s.getLocations());
+		System.out.println("After sorting \n" + result);
 		return result;
 	}
 }

@@ -145,7 +145,7 @@ public class FileParser {
 				String description= tokens[5];
 				String date= tokens[6];
 				String extension = tokens[7];
-				boolean active = Boolean.getBoolean(tokens[7]);
+				boolean active = Boolean.parseBoolean(tokens[8]);
 				
 				temp = new FileDetails(index,path,name,author,subject,description,date,extension,active);
 				Path a = Paths.get(temp.getPath());

@@ -37,9 +37,9 @@ public class Controller
 	private  final String storageFolderPath = "./StorageFolder";
 	private  final String fileDetailsPath = "./FileDetailsStorage/details.txt";
 	private final ArrayList<String> documentExtension = 
-			new ArrayList<String>(Arrays.asList("txt","doc","pdf"));
+			new ArrayList<String>(Arrays.asList(".txt",".doc",".pdf"));
 	private final ArrayList<String> imageExtension = 
-			new ArrayList<String>(Arrays.asList("png","jpg","bmp", "gif"));
+			new ArrayList<String>(Arrays.asList(".png",".jpg",".bmp", ".gif"));
 	private final ArrayList<String> soundExtension = 
 			new ArrayList<String>(Arrays.asList("wav","mp3"));
 	private  ArrayList<FileDetails> filesInfo = new ArrayList<FileDetails>();
@@ -157,7 +157,7 @@ public class Controller
 				String description= tokens[5];
 				String date= tokens[6];
 				String extension= tokens[7];
-				Boolean active = Boolean.getBoolean(tokens[8]);
+				Boolean active = Boolean.parseBoolean(tokens[8]);
 				
 				filesInfo.add(new FileDetails(index,path,name,author,subject,description,date,extension,active));
 				
@@ -224,6 +224,9 @@ public class Controller
 			links = new Vector<Link>();
 			ArrayList<SearchResult> results = new ArrayList<SearchResult>();
 			results = Searcher.SearchWord(query);
+			if(results.size()==0)
+				throw new NoResultsException("Search returned no results!");
+
 			for(SearchResult result: results)
 			{
 				result.getFileDetails().setPath(storageFolderPath + "/" + 
@@ -237,8 +240,7 @@ public class Controller
 			
 		} catch (Exception e) 
 		{
-			if(links.size()==0)
-				throw new NoResultsException("Search returned no results!");
+			e.printStackTrace();
 		}
 		
 		return links;
@@ -260,12 +262,12 @@ public class Controller
 		{
 			if(file.getDocumentName().equals(docName))
 			{
-				temp = file;
+				file.setActive(isActive);
 				break;
 			}
 			saveFileDetails(file);
 		}
-		temp.setActive(isActive);
+		
 		
 	}
 	public void setBatch(String str)

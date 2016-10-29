@@ -10,13 +10,7 @@ import java.io.File;
  * 
  */
 public class FileMonitor extends Thread{
-	public long getBatchTime() {
-		return batchTime;
-	}
-
-	public void setBatchTime(long batchTime) {
-		this.batchTime = batchTime;
-	}
+	
 
 	private final String sourceFolderPath = "./SourceFolder";
 	private final String InvertedFolderPath = "./InvertedFile";
@@ -74,6 +68,13 @@ public class FileMonitor extends Thread{
 			}
 		}
 		
+	}
+	public long getBatchTime() {
+		return batchTime;
+	}
+
+	public void setBatchTime(long batchTime) {
+		this.batchTime = batchTime;
 	}
 
 }

@@ -1,3 +1,5 @@
 0;Golan;.\SourceFolder\Golan.txt;Golan;Golan;Golan;12/12/1999;.txt;true;
 1;Tal;.\SourceFolder\Tal.txt;Golan;Golan;Golan;12/12/1999;.txt;true;
 2;Tal2;.\SourceFolder\Tal2.txt;Golan;Golan;Golan;12/12/1999;.txt;true;
+3;SAM;.\SourceFolder\SAM.jpg;Golan;SAM;SAM;12/21/1999;.jpg;true;
+4;Day And Night;.\SourceFolder\Day And Night.txt;Golan;123;Very good Book;12/12/1212;.txt;true;

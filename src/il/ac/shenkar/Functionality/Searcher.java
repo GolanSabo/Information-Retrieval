@@ -67,9 +67,15 @@ public class Searcher {
 					}
 				}
 				else
+					if(nextWord.endsWith("*"))
+						tmp = wildCard(nextWord);
+					else
 					tmp = (ArrayList<Node>) invertedFile.get(nextWord);
 				if(notFlag % 2 == 1){
 					nextWord = words[++i];
+					if(nextWord.endsWith("*"))
+						tmp = wildCard(nextWord);
+					else
 					tmp = (ArrayList<Node>) invertedFile.get(nextWord);
 					tmp = logicalNot(tmp,invertedFile);
 					notFlag = 0;
@@ -140,10 +146,17 @@ public class Searcher {
 						i = words.length - t.length - 1;
 					}
 				}
-				else
-					tmp = (ArrayList<Node>) invertedFile.get(nextWord);
+				else{
+					if(nextWord.endsWith("*"))
+						tmp = wildCard(nextWord);
+					else
+						tmp = (ArrayList<Node>) invertedFile.get(nextWord);
+				}
 				if(notFlag % 2 == 1){
 					nextWord = words[++i];
+					if(nextWord.endsWith("*"))
+						tmp = wildCard(nextWord);
+					else
 					tmp = (ArrayList<Node>) invertedFile.get(nextWord);
 					tmp = logicalNot(tmp,invertedFile);
 					notFlag = 0;
@@ -258,6 +271,21 @@ public class Searcher {
 
 		}
 		return list;
+	}
+
+	private static ArrayList<Node> wildCard(String word){
+		word = word.replace("*", "");
+		Set<String> set = invertedFile.keySet();
+		ArrayList<Node> tmp = new ArrayList<>();
+		Iterator itr = set.iterator();
+		while(itr.hasNext()){
+			String str = (String)itr.next();
+			if(str.startsWith(word))
+				tmp.addAll((ArrayList<Node>)invertedFile.get(str));
+		}
+		
+		return tmp;
+			
 	}
 
 	private static ArrayList<SearchResult> calculateResult(ArrayList<Node> list){

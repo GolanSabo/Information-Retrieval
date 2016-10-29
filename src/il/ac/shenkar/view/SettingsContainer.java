@@ -2,6 +2,7 @@ package il.ac.shenkar.view;
 
 import il.ac.shenkar.controller.Controller;
 import il.ac.shenkar.errors.DuplicateNameException;
+import il.ac.shenkar.errors.FilePathException;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -15,6 +16,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
+import java.text.ParseException;
 
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
@@ -305,6 +307,14 @@ public class SettingsContainer  extends JPanel implements ActionListener{
 			} catch (DuplicateNameException err) {
 				JOptionPane.showMessageDialog(this,"The documnet name already exists in database!\n"
 						+ "Please try a different name", "Duplicate Name Error",JOptionPane.ERROR_MESSAGE);
+
+			} catch (ParseException e1) {
+				JOptionPane.showMessageDialog(this,e1.getMessage() + "\n" 
+						+ "Please make sure the date format is MM/dd/yyyy", "Date Format Error",JOptionPane.ERROR_MESSAGE);
+
+			} catch (FilePathException e1) {
+				JOptionPane.showMessageDialog(this,e1.getMessage() + "\n" 
+						+ "Please make sure the file path is correct", "File Path Error",JOptionPane.ERROR_MESSAGE);
 
 			}
 			documents = new JComboBox(Controller.getInstance().getDocumentsNames());

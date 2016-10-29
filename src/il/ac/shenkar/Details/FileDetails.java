@@ -1,6 +1,7 @@
 package il.ac.shenkar.Details;
 
 import il.ac.shenkar.Utils.FileUtils;
+import il.ac.shenkar.errors.DateFormatException;
 
 import java.io.File;
 import java.io.Serializable;
@@ -18,7 +19,6 @@ public class FileDetails implements Serializable{
 	private static final long serialVersionUID = 1L;
 	private int index;
 	private String path = null;
-	private String name = null;
 	private String documentName = null;
 	private String author = null;
 	private String subject = null;
@@ -30,7 +30,7 @@ public class FileDetails implements Serializable{
 
 
 	public FileDetails(int _index, String _path, String docName, String _author, String _subject
-			, String _description, String _date, String _extension,boolean _active)
+			, String _description, String _date, String _extension,boolean _active) throws ParseException
 	{
 		index = _index;
 		active = _active;
@@ -43,14 +43,9 @@ public class FileDetails implements Serializable{
 		String pattern = "MM/dd/yyyy";
 	    format = new SimpleDateFormat(pattern);
 	    date = new Date();
-	    try {
 	    	 date = format.parse(_date);
 	    	 
 	    	
-		} catch (ParseException e) {
-			
-			System.out.println("Date format is incorrect!");
-		}
 	}
 	
 	
@@ -96,9 +91,6 @@ public class FileDetails implements Serializable{
 	 * returns the file name
 	 * @return string - fileName
 	 */
-	public String getName() {
-		return name;
-	}
 	
 	public String getPath() {
 		return path;

@@ -36,6 +36,7 @@ import javax.swing.text.StyleConstants;
 import javax.swing.text.StyleContext;
 
 import il.ac.shenkar.Details.FileDetails;
+import il.ac.shenkar.Functionality.SearchResult;
 import il.ac.shenkar.controller.Controller.ResultType;
 
 
@@ -44,41 +45,31 @@ public class Link extends JPanel implements MouseListener
 {
 	private String keyword;
 	private ArrayList<Integer> locations;
-	public ArrayList<Integer> getLocations() {
-		return locations;
-	}
-
-
-
-
-	public void setLocations(ArrayList<Integer> locations) {
-		this.locations = locations;
-	}
+	private FileDetails fileDetails;
 	private String path;
-	private JLabel title;
+	private JLabel documentName;
 	private JTextPane pane;
-	private String documentName;
 	private JPanel container;
 	private ResultType type;
 	private String description;
 	
-	public Link(String _path,String _title, String _description, String word, 
-			ArrayList<Integer> _locations, ResultType _type)
+	
+	public Link(SearchResult result, ResultType _type)
 	{
+		fileDetails = result.getFileDetails();
 		type = _type;
-		keyword = word;
-		 path=_path;
-		 title = new JLabel(_title);
-		 title.setForeground(Color.blue);
-		 title.setAlignmentX(JLabel.LEFT);
-		 title.setFont(new Font(Font.SERIF,3,14));
+		path=result.getFileDetails().getPath();
+		documentName = new JLabel(result.getFileDetails().getDocumentName());
+		documentName.setForeground(Color.blue);
+		documentName.setAlignmentX(JLabel.LEFT);
+		documentName.setFont(new Font(Font.SERIF,3,14));
 		 pane = new JTextPane();
 		 pane.setFont(new Font(Font.DIALOG_INPUT,0,14));
 		 pane.setEditable(false);
-		 description = _description;
+		description = result.getFileDetails().getDescription();
 		 container = new JPanel();
 		 locations = new ArrayList<Integer>();
-		 locations = _locations;
+		locations = result.getLocations();
 		createLinkPanel();
 		
 		 
@@ -86,9 +77,15 @@ public class Link extends JPanel implements MouseListener
 	
 	
 
-	
+	public ArrayList<Integer> getLocations() {
+		return locations;
+	}
+
+	public void setLocations(ArrayList<Integer> locations) {
+		this.locations = locations;
+	}
 	public String getDocumentName() {
-		return title.getText();
+		return documentName.getText();
 	}
 
 
@@ -109,11 +106,11 @@ public class Link extends JPanel implements MouseListener
 		GridBagConstraints c = new GridBagConstraints();
 		setDescription();
 
-		title.addMouseListener(this);
+		documentName.addMouseListener(this);
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.gridx=0;
 		c.gridy = 0;
-		container.add(title,c);
+		container.add(documentName,c);
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.gridx=0;
 		c.gridy = 1;
@@ -152,8 +149,12 @@ public class Link extends JPanel implements MouseListener
 			int numberOfLines = 3;
 			for(int i=0;i<numberOfLines;i++)
 			{
-				textData.append(textReader.readLine());
+				String line = textReader.readLine();
+				if(line!=null)
+				{
+					textData.append(line);
 				textData.append('\n');
+			}
 			}
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
@@ -183,6 +184,18 @@ public class Link extends JPanel implements MouseListener
 
 
 	
+	public FileDetails getFileDetails() {
+		return fileDetails;
+	}
+
+
+
+	public void setFileDetails(FileDetails fileDetails) {
+		this.fileDetails = fileDetails;
+	}
+
+
+
 	@Override
 	public void mouseClicked(MouseEvent e) 
 	{
@@ -191,7 +204,7 @@ public class Link extends JPanel implements MouseListener
 	}
 	@Override
 	public void mouseEntered(MouseEvent e) {
-		title.setCursor(new Cursor(Cursor.HAND_CURSOR));
+		documentName.setCursor(new Cursor(Cursor.HAND_CURSOR));
         
 	}
 	@Override
@@ -203,14 +216,14 @@ public class Link extends JPanel implements MouseListener
 	public void mousePressed(MouseEvent e) {
 		if(type == ResultType.DOCUMENT)
 		{
-			DocumentDisplay display = new DocumentDisplay(this);
-			display.setTitle(title.getText());
+			DocumentDisplay display = new DocumentDisplay(getFileDetails(),getLocations());
+			display.setTitle(documentName.getText());
 			display.createDisplay();
 		}
 		else if(type == ResultType.IMAGE)
 		{
 			ImageDisplay display = new ImageDisplay(this);
-			display.setTitle(title.getText());
+			display.setTitle(documentName.getText());
 			display.createDisplay();
 		}
 		

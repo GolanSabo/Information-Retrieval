@@ -1,14 +1,15 @@
 package il.ac.shenkar.Functionality;
 
-import il.ac.shenkar.Details.Node;
-import il.ac.shenkar.FileMonitor.FileMonitor;
-import il.ac.shenkar.Utils.FileUtils;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 import java.util.Stack;
+
+import il.ac.shenkar.Details.Node;
+import il.ac.shenkar.FileMonitor.FileMonitor;
+import il.ac.shenkar.Utils.FileUtils;
 
 public class Searcher {
 
@@ -17,7 +18,7 @@ public class Searcher {
 	private static Map invertedFile = FileUtils.LoadFromFile(fileName);
 	private static int notFlag = 0;
 
-	public static ArrayList<SearchResult> SearchWord(String query) throws Exception{
+	public static ArrayList<SearchResult> SearchWord(String query) throws Exception {
 		query = query.toLowerCase();
 		while(FileMonitor.isActive()){
 			System.out.println("Wait for Batch Job To End");

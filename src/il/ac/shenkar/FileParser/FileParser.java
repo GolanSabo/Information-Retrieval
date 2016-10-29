@@ -15,6 +15,7 @@ import java.io.InputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Scanner;
@@ -44,10 +45,15 @@ public class FileParser {
 		int counter = 0;
 		Scanner scanner;
 		invertedFile = new HashMap<String, Node>();
-		FileDetails fileDetails = getFileDetailsFromDataBase(file);
+		FileDetails fileDetails= null;
+		try {
+			fileDetails = getFileDetailsFromDataBase(file);
+		} catch (ParseException e1) {
+			System.out.println("Could not read date from database");
+		}
 		Node node;
 		try {
-			parse(fileDetails.getName(), fileDetails, -2);
+			parse(fileDetails.getDocumentName(), fileDetails, -2);
 			parse(fileDetails.getDescription(), fileDetails, -3);
 			parse(fileDetails.getAuthor(), fileDetails, -4);
 			DateFormat sdf = new SimpleDateFormat("dd/mm/yy");
@@ -117,7 +123,7 @@ public class FileParser {
 		}
 	}
 	
-	private static FileDetails getFileDetailsFromDataBase(File file) 
+	private static FileDetails getFileDetailsFromDataBase(File file) throws ParseException 
 	{
 		FileDetails temp = null;
 		BufferedReader br = null;

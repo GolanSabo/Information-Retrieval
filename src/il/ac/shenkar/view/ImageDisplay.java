@@ -1,6 +1,7 @@
 package il.ac.shenkar.view;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -18,6 +19,7 @@ public class ImageDisplay extends JFrame implements ActionListener, ILinkDisplay
 	@Override
 	public void createDisplay() 
 	{
+		setPreferredSize(new Dimension(400,400));
 		setLayout(new BorderLayout());
 		add(image,BorderLayout.CENTER);
 		setVisible(true);

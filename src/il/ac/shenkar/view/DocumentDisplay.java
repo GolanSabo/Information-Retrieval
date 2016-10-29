@@ -11,6 +11,9 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import javax.swing.text.*;
+
+import il.ac.shenkar.Details.FileDetails;
+
 import javax.swing.*;
 
 public class DocumentDisplay extends JFrame implements ActionListener, ILinkDisplay
@@ -19,25 +22,30 @@ public class DocumentDisplay extends JFrame implements ActionListener, ILinkDisp
 	private int currentPage = 1;
 	private JTextPane tPane;
 	private JPanel textArea;
+	private JTextPane detailsPane;
 	private String [] text;
 	private ArrayList<Integer> locations;
 	private ArrayList<Page> pages;
 	private JButton back;
 	private JButton next;
-	private String keyword;
 	private JPanel bottomPanel;
 	private JTextField changePage;
 	private JLabel numberOfPages;
 	private JScrollPane scrollpane;
 	private String path;
-	public DocumentDisplay(Link l)
+	private String author;
+	private String subject;
+	private String date;
+	private JPanel detailsPanel;
+	public DocumentDisplay(FileDetails fd, ArrayList<Integer> _locations)
 	{
-		path = l.getPath();
-		locations = l.getLocations();
-		keyword = l.getKeyword();
+		path = fd.getPath();
+		locations = _locations;
+		author = fd.getAuthor();
+		subject = fd.getSubject();
+		date = fd.getDate().toString();
 		textArea = new JPanel();
 		tPane = new JTextPane();
-		
 		back = new JButton();
 		next = new JButton();
 		try {
@@ -46,6 +54,7 @@ public class DocumentDisplay extends JFrame implements ActionListener, ILinkDisp
 			
 			System.out.println("Error reading link!");
 		}
+		
 		pages = new ArrayList<Page>();
 		bottomPanel = new JPanel();
 		back.addActionListener(this);
@@ -57,10 +66,19 @@ public class DocumentDisplay extends JFrame implements ActionListener, ILinkDisp
 		changePage.addActionListener(this);
 		numberOfPages = new JLabel("");
 		scrollpane = new JScrollPane(tPane);
+		detailsPanel = new JPanel();
+		detailsPane = new JTextPane();
+		setDetailsPanel();
 		getPages();
 		
 	}
 	
+	private void setDetailsPanel() 
+	{
+		
+		
+	}
+
 	public void createDisplay()
 	{
 		

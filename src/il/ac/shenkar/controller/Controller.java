@@ -12,6 +12,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Vector;
@@ -25,6 +26,7 @@ import il.ac.shenkar.Functionality.SearchResult;
 import il.ac.shenkar.Functionality.Searcher;
 import il.ac.shenkar.Utils.FileUtils;
 import il.ac.shenkar.errors.DuplicateNameException;
+import il.ac.shenkar.errors.FilePathException;
 import il.ac.shenkar.errors.NoResultsException;
 import il.ac.shenkar.view.Link;
 import il.ac.shenkar.view.MainView;
@@ -99,8 +101,12 @@ public class Controller
 	}
 	
 	public  void storeInDatabase(String filePath, String docName, String _author
-			,String _subject, String _description, String _date) throws IOException, DuplicateNameException
+			,String _subject, String _description, String _date) throws IOException, DuplicateNameException, ParseException, FilePathException
 	{
+		File source = new File(filePath);
+		if(!source.exists())
+			throw new FilePathException("File Does not exist");
+		
 		Path src = Paths.get(filePath);
 		
 		checkDocumentsIfNameExists(docName);
@@ -130,7 +136,7 @@ public class Controller
 		}
 		
 	}
-	public  void loadFileDetailsFromDatabase() 
+	public  void loadFileDetailsFromDatabase() throws ParseException 
 	{
 		BufferedReader br = null;
 		String line = null;
@@ -224,23 +230,24 @@ public class Controller
 			links = new Vector<Link>();
 			ArrayList<SearchResult> results = new ArrayList<SearchResult>();
 			results = Searcher.SearchWord(query);
-			if(results.size()==0)
-				throw new NoResultsException("Search returned no results!");
 
 			for(SearchResult result: results)
 			{
 				result.getFileDetails().setPath(storageFolderPath + "/" + 
 			result.getFileDetails().getDocumentName() + result.getFileDetails().getExtension());
-				FileDetails temp = result.getFileDetails();
-				ResultType type = getResultType(temp.getExtension());
-				links.addElement(new Link(temp.getPath(),temp.getDocumentName(),temp.getDescription()
-						,query, result.getLocations(),type));	
+				ResultType type = getResultType(result.getFileDetails().getExtension());
+				links.addElement(new Link(result,type));	
 			}
 			
 			
-		} catch (Exception e) 
+		} 
+		catch (NoResultsException e) 
 		{
-			e.printStackTrace();
+			throw new NoResultsException("Search returned no results!");
+		}
+		catch (Exception e) 
+		{
+			throw new NoResultsException("Search returned no results!");
 		}
 		
 		return links;
@@ -289,11 +296,12 @@ public class Controller
 	{
 		fileMonitor = new FileMonitor(20 * 1000);
 		fileMonitor.start();
+		try {
 		loadFileDetailsFromDatabase();
+		} catch (ParseException e) {
+			System.out.println("Date Format incorrect");
+		}
 	}
-	
-	
-
 	
 	
 }

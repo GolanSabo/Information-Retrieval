@@ -38,6 +38,7 @@ public class Controller
 	private  final String sourceFolderPath = "./SourceFolder";
 	private  final String storageFolderPath = "./StorageFolder";
 	private  final String fileDetailsPath = "./FileDetailsStorage/details.txt";
+	private  final String detailsPath = "./FileDetailsStorage";
 	private final ArrayList<String> documentExtension = 
 			new ArrayList<String>(Arrays.asList(".txt",".doc",".pdf"));
 	private final ArrayList<String> imageExtension = 
@@ -51,46 +52,38 @@ public class Controller
 	
 	private Controller(){}
 	
-	
+	/**
+	 * Returns the instance of the controller
+	 * @return the instance of the controller
+	 */
 	public static Controller getInstance()
 	{
 		if(_instance==null)
 			_instance = new Controller();
 		return _instance;
 	}
-	
-	public MainView getView() {
-		return view;
-	}
 
-
-	public void setView(MainView view) {
-		this.view = view;
-	}
-
-
-	public FileMonitor getFileMonitor() {
-		return fileMonitor;
-	}
-
-
-	public void setFileMonitor(FileMonitor fileMonitor) {
-		this.fileMonitor = fileMonitor;
-	}
-
-
+	/**
+	 * A method that returns the document names in database
+	 * @return A vector of document names in database
+	 */
 	public  Vector<String> getDocumentsNames() 
 	{
-		
+
 		Vector<String> names = new Vector<>();
-		
-	    for(FileDetails fd: filesInfo)
-	    {
-	    	names.add(fd.getDocumentName());
-	    }
-	    return names;
+
+		for(FileDetails fd: filesInfo)
+		{
+			names.add(fd.getDocumentName());
+		}
+		return names;
 	}
 	
+	/*
+	 * A method that checks the extension and returns the type
+	 * @param ext - the extension
+	 * @return - the result type (DOCUMENT/IMAGE)
+	 */
 	private ResultType getResultType(String ext)
 	{
 		if(documentExtension.contains(ext))
@@ -100,6 +93,19 @@ public class Controller
 		else return ResultType.DOCUMENT;
 	}
 	
+	/**
+	 * Stores the file details as received from the GUI
+	 * @param filePath
+	 * @param docName
+	 * @param _author
+	 * @param _subject
+	 * @param _description
+	 * @param _date
+	 * @throws IOException - Thrown if cannot copy file to Source folder
+	 * @throws DuplicateNameException - Thrown if the Document name already exist in Database
+	 * @throws ParseException - Thrown when date format is incorrect
+	 * @throws FilePathException - Thrown if the file path doesn't exist
+	 */
 	public  void storeInDatabase(String filePath, String docName, String _author
 			,String _subject, String _description, String _date) throws IOException, DuplicateNameException, ParseException, FilePathException
 	{
@@ -116,15 +122,17 @@ public class Controller
 		FileUtils.writeIndex(index);
 		FileDetails newFile = new FileDetails(index,dest.toString(), docName, _author, 
 				_subject, _description, _date, extension,true);
-		saveFileDetails(newFile);
+		//saveFileDetails(newFile);
 		filesInfo.add(newFile);
-		
+		FileUtils.SaveToFile(filesInfo, "fileDetails.ser", detailsPath);
 		
 			Files.copy(src, dest, StandardCopyOption.REPLACE_EXISTING);
 		
 	}
 	
-	
+	/*
+	 * Checks if the document name exists in database
+	 */
 	private  void checkDocumentsIfNameExists(String docName) throws DuplicateNameException
 	{
 		for(FileDetails file: filesInfo)
@@ -136,8 +144,24 @@ public class Controller
 		}
 		
 	}
-	public  void loadFileDetailsFromDatabase() throws ParseException 
+	
+	/**
+	 * Loads the file details from database to filesInfo
+	 */
+	public  void loadFileDetailsFromDatabase()
 	{
+
+		File file = new File(detailsPath + "/fileDetails.ser");
+		if(!file.exists())
+			filesInfo = new ArrayList<FileDetails>();
+		else
+			filesInfo = FileUtils.loadFileDetailsFromFile(detailsPath + "/fileDetails.ser");
+		
+
+	}
+	/*public  void loadFileDetailsFromDatabase() throws ParseException 
+	{
+		
 		BufferedReader br = null;
 		String line = null;
 		String[] tokens;
@@ -178,7 +202,8 @@ public class Controller
 		}
 	
 		
-	}
+	}*/
+	/*
 	private  void saveFileDetails(FileDetails newFile) 
 	{
 		StringBuilder details = new StringBuilder(newFile.toString());
@@ -219,7 +244,15 @@ public class Controller
 		}
 		
 		
-	}
+	}*/
+	
+	/**
+	 * A method that gets the query from the view and returns the links associated
+	 * with the query
+	 * @param query - The query from the user
+	 * @return - a vector of Links
+	 * @throws NoResultsException - Thrown when there are no results
+	 */
 	public  Vector<Link> getResults(String query) throws NoResultsException
 	{
 		
@@ -254,29 +287,46 @@ public class Controller
 	
 	}
 	
-	
+	/*
+	 * A method to get the extension of the file
+	 */
 	private  String getExtension(String _path) {
 		int pos = _path.lastIndexOf(".");
 		if (pos == -1) return _path;
 		return _path.substring(pos,_path.length());
 	}
+	
+	/**
+	 * A method to change the visibility of a file
+	 * @param docName - The name of the file to be changed
+	 * @param isActive - True if visible, False if file to be hidden
+	 */
 	public  void changeVisibility(String docName, boolean isActive) 
 	{
-		File details = new File(fileDetailsPath);
-		details.delete();
-		FileDetails temp = null;
+		
 		for(FileDetails file: filesInfo)
 		{
 			if(file.getDocumentName().equals(docName))
 			{
 				file.setActive(isActive);
-				break;
+				
 			}
-			saveFileDetails(file);
+		}
+		try {
+			FileUtils.SaveToFile(filesInfo, "fileDetails.ser", detailsPath);
+			//filesInfo = FileUtils.loadFileDetailsFromFile(detailsPath + "fileDetails.ser");
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		
 		
 	}
+	
+	/**
+	 * A method to set the batch time
+	 * @param str - The string representing the time passed from the view
+	 */
 	public void setBatch(String str)
 	{
 		long time = 0;
@@ -292,16 +342,57 @@ public class Controller
 			time = 24*60*60*1000;
 		fileMonitor.setBatchTime(time);
 	}
+	
+	/**
+	 * The initialization process  
+	 */
 	public void init()
 	{
 		fileMonitor = new FileMonitor(20 * 1000);
 		fileMonitor.start();
-		try {
 		loadFileDetailsFromDatabase();
-		} catch (ParseException e) {
-			System.out.println("Date Format incorrect");
-		}
+		
 	}
+	
+	public boolean checkIfFileIsActive(int fileIndex)
+	{
+		for(FileDetails fd: filesInfo)
+		{
+			if(fd.getIndex()==fileIndex)
+				return fd.isActive();
+		}
+		return false;
+	}
+	
+	public ArrayList<FileDetails> getFilesInfo() {
+		return filesInfo;
+	}
+
+	public void setFilesInfo(ArrayList<FileDetails> filesInfo) {
+		this.filesInfo = filesInfo;
+	}
+
+	public MainView getView() {
+		return view;
+	}
+
+
+	public void setView(MainView view) {
+		this.view = view;
+	}
+
+
+	public FileMonitor getFileMonitor() {
+		return fileMonitor;
+	}
+
+
+	public void setFileMonitor(FileMonitor fileMonitor) {
+		this.fileMonitor = fileMonitor;
+	}
+
+
+
 	
 	
 }

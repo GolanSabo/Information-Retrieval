@@ -7,9 +7,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 
+import il.ac.shenkar.Details.FileDetails;
 import il.ac.shenkar.Details.Node;
 import il.ac.shenkar.FileMonitor.FileMonitor;
 import il.ac.shenkar.Utils.FileUtils;
+import il.ac.shenkar.controller.Controller;
 
 public class Searcher {
 
@@ -304,7 +306,7 @@ public class Searcher {
 				}
 			}
 			if(!match){
-				if(tmp.getFileDetails().isActive())
+				if(Controller.getInstance().checkIfFileIsActive(tmp.getFileDetails().getIndex()))
 					result.add(new SearchResult(tmp.getFileDetails(), tmp.getLocations()));
 			}
 		}
@@ -315,4 +317,7 @@ public class Searcher {
 		System.out.println("After sorting \n" + result);
 		return result;
 	}
+
+
+	
 }

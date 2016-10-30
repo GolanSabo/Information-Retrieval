@@ -101,6 +101,7 @@ public class SettingsContainer  extends JPanel implements ActionListener{
 		visible.setText("Visible");
 		radioList = new ButtonGroup();
 		save = new JButton("save"); 
+		save.addActionListener(this);
 		batchTime = new JComboBox(batch);
 		lBatchTime = new JTextPane();
 		lBatchTime.setText("Please select how often will the system"

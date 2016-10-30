@@ -4,6 +4,7 @@ import il.ac.shenkar.Details.FileDetails;
 import il.ac.shenkar.Details.Node;
 import il.ac.shenkar.Utils.FileUtils;
 import il.ac.shenkar.Utils.StopList;
+import il.ac.shenkar.controller.Controller;
 
 import java.io.BufferedReader;
 import java.io.DataInputStream;
@@ -17,6 +18,7 @@ import java.nio.file.Paths;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Scanner;
 
@@ -46,10 +48,13 @@ public class FileParser {
 		Scanner scanner;
 		invertedFile = new HashMap<String, Node>();
 		FileDetails fileDetails= null;
-		try {
-			fileDetails = getFileDetailsFromDataBase(file);
-		} catch (ParseException e1) {
-			System.out.println("Could not read date from database");
+		ArrayList<FileDetails> details = Controller.getInstance().getFilesInfo();
+		for(FileDetails fd: details)
+		{
+			Path a = Paths.get(fd.getPath());
+			Path b = Paths.get(file.getPath());
+			if (a.compareTo(b)==0)
+				fileDetails = fd;
 		}
 		Node node;
 		try {

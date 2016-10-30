@@ -1,5 +1,6 @@
 package il.ac.shenkar.Utils;
 
+import il.ac.shenkar.Details.FileDetails;
 import il.ac.shenkar.Details.Node;
 
 import java.io.File;
@@ -13,6 +14,7 @@ import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
@@ -88,6 +90,23 @@ public class FileUtils {
 		} 
 
 		return invertedFile;
+	}
+	
+	public static ArrayList<FileDetails> loadFileDetailsFromFile(String path){
+		ArrayList<FileDetails> details = null;
+		try {
+			FileInputStream inputFileStream = new FileInputStream(path);
+			ObjectInputStream objectInputStream = new ObjectInputStream(inputFileStream);
+			details = (ArrayList<FileDetails>)objectInputStream.readObject();
+			objectInputStream.close();
+			inputFileStream.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		} 
+
+		return details;
 	}
 
 	/**

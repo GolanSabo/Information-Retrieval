@@ -43,7 +43,7 @@ public class SettingsContainer  extends JPanel implements ActionListener{
 	private JButton searchFile;
 	private JFileChooser fc;
 	private JTabbedPane tabbedPane;
-	private JComboBox documents;
+	private JComboBox<String> documents;
 	private JLabel lName;
 	private JTextField name;
 	private JLabel lSubject;
@@ -68,6 +68,7 @@ public class SettingsContainer  extends JPanel implements ActionListener{
 	private JTextPane explanation;
 	private String[] batch = {"20 seconds","5 minutes","20 minutes","1 hour","24 hours"};
 	private JButton saveBatch;
+	private JPanel radioPanel;
 	
 	public SettingsContainer()
 	{
@@ -117,13 +118,6 @@ public class SettingsContainer  extends JPanel implements ActionListener{
 		explanation.setBackground(Color.lightGray);
 		saveBatch = new JButton("Update");
 		saveBatch.addActionListener(this);
-		createSettings();
-	}
-
-	private void addComponentToPane(Container pane) {
-
-		tabbedPane = new JTabbedPane();
-		//Create the "cards".
 		card1 = new JPanel() {
 
 			public Dimension getPreferredSize() {
@@ -132,6 +126,42 @@ public class SettingsContainer  extends JPanel implements ActionListener{
 				return size;
 			}
 		};
+		card2 = new JPanel() {
+
+			public Dimension getPreferredSize() {
+				Dimension size = super.getPreferredSize();
+				size.width += extraWindowWidth;
+				return size;
+			}
+		};
+
+		container = new JPanel() {
+
+			public Dimension getPreferredSize() {
+				Dimension size = super.getPreferredSize();
+				size.width += extraWindowWidth;
+				return size;
+			}
+		};
+		radioPanel = new JPanel(new GridLayout(0, 1));
+		
+		card3 = new JPanel() {
+
+			public Dimension getPreferredSize() {
+				Dimension size = super.getPreferredSize();
+				size.width += extraWindowWidth;
+				return size;
+			}
+		};
+		tabbedPane = new JTabbedPane();
+		createSettings();
+	}
+
+	private void addComponentToPane(Container pane) {
+
+		
+		
+		
 		card1.setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
 		c.gridx = 0;
@@ -206,26 +236,7 @@ public class SettingsContainer  extends JPanel implements ActionListener{
 		c.gridy = 9;
 		c.fill = GridBagConstraints.NONE;
 		card1.add(go,c);
-
-
-
-		card2 = new JPanel() {
-
-			public Dimension getPreferredSize() {
-				Dimension size = super.getPreferredSize();
-				size.width += extraWindowWidth;
-				return size;
-			}
-		};
-
-		container = new JPanel() {
-
-			public Dimension getPreferredSize() {
-				Dimension size = super.getPreferredSize();
-				size.width += extraWindowWidth;
-				return size;
-			}
-		};
+		
 		container.setLayout(new GridBagLayout());
 
 		c.gridx = 0;
@@ -245,7 +256,7 @@ public class SettingsContainer  extends JPanel implements ActionListener{
 
 
 		container.add(documents,c);
-		JPanel radioPanel = new JPanel(new GridLayout(0, 1));
+		
 		radioList.add(visible);
 		radioList.add(hidden);
 		radioPanel.add(visible);
@@ -266,14 +277,7 @@ public class SettingsContainer  extends JPanel implements ActionListener{
 		card2.add(container);
 		
 
-		card3 = new JPanel() {
-
-			public Dimension getPreferredSize() {
-				Dimension size = super.getPreferredSize();
-				size.width += extraWindowWidth;
-				return size;
-			}
-		};
+		
 		
 		card3.add(lBatchTime);
 		card3.add(batchTime);
@@ -301,6 +305,7 @@ public class SettingsContainer  extends JPanel implements ActionListener{
 			try {
 				Controller.getInstance().storeInDatabase(path.getText(),name.getText(),author.getText(),
 						subject.getText(),description.getText(),date.getText());
+				documents.addItem((String)name.getText());
 			} catch (IOException e1) {
 				JOptionPane.showMessageDialog(this,"Could not store file in database!\n"
 						, "IO Error",JOptionPane.ERROR_MESSAGE);
@@ -318,7 +323,8 @@ public class SettingsContainer  extends JPanel implements ActionListener{
 						+ "Please make sure the file path is correct", "File Path Error",JOptionPane.ERROR_MESSAGE);
 
 			}
-			documents = new JComboBox(Controller.getInstance().getDocumentsNames());
+			
+			createSettings();
 
 
 		}

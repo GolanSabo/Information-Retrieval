@@ -128,54 +128,6 @@ public class FileParser {
 		}
 	}
 	
-	private static FileDetails getFileDetailsFromDataBase(File file) throws ParseException 
-	{
-		FileDetails temp = null;
-		BufferedReader br = null;
-		String line = null;
-		String[] tokens;
-		try {
-			File detailsFile = null;
-			detailsFile = new File(fileDetailsPath);
-			
-			FileReader fr = new FileReader(detailsFile);
-			br = new BufferedReader(fr);
-			
-			//Read the next currency
-			line = br.readLine();
-			
-			while(line!=null)
-			{
-				
-				tokens = line.split(";");
-				int index = Integer.parseInt(tokens[0]);
-				String name = tokens[1];
-				String path = tokens[2];
-				String author = tokens[3];
-				String subject= tokens[4];
-				String description= tokens[5];
-				String date= tokens[6];
-				String extension = tokens[7];
-				boolean active = Boolean.parseBoolean(tokens[8]);
-				
-				temp = new FileDetails(index,path,name,author,subject,description,date,extension,active);
-				Path a = Paths.get(temp.getPath());
-				Path b = Paths.get(file.getPath());
-				if (a.compareTo(b)==0)
-					return temp;
-				
-				line = br.readLine();
-			}
-			
-		} 
-		catch (IOException e) 
-		{
-            System.out.println("IO Error occured trying to read from local database");
-		}
-	
-		
-		return null;
-	}
 	
 	
 

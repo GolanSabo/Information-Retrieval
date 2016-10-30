@@ -164,7 +164,8 @@ public class Searcher {
 					tmp = logicalNot(tmp,invertedFile);
 					notFlag = 0;
 				}
-				list.addAll(tmp);
+				if(tmp!=null)
+					list.addAll(tmp);
 			}
 		}
 

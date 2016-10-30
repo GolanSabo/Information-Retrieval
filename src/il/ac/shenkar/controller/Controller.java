@@ -37,7 +37,6 @@ public class Controller
 	public enum ResultType {DOCUMENT, IMAGE, SOUND};
 	private  final String sourceFolderPath = "./SourceFolder";
 	private  final String storageFolderPath = "./StorageFolder";
-	private  final String fileDetailsPath = "./FileDetailsStorage/details.txt";
 	private  final String detailsPath = "./FileDetailsStorage";
 	private final ArrayList<String> documentExtension = 
 			new ArrayList<String>(Arrays.asList(".txt",".doc",".pdf"));
@@ -122,7 +121,6 @@ public class Controller
 		FileUtils.writeIndex(index);
 		FileDetails newFile = new FileDetails(index,dest.toString(), docName, _author, 
 				_subject, _description, _date, extension,true);
-		//saveFileDetails(newFile);
 		filesInfo.add(newFile);
 		FileUtils.SaveToFile(filesInfo, "fileDetails.ser", detailsPath);
 		
@@ -159,92 +157,6 @@ public class Controller
 		
 
 	}
-	/*public  void loadFileDetailsFromDatabase() throws ParseException 
-	{
-		
-		BufferedReader br = null;
-		String line = null;
-		String[] tokens;
-		try {
-			File file = null;
-			file = new File(fileDetailsPath);
-			
-			FileReader fr = new FileReader(file);
-			br = new BufferedReader(fr);
-			
-			//Read the next currency
-			line = br.readLine();
-			
-			while(line!=null)
-			{
-				
-				tokens = line.split(";");
-				int index = Integer.parseInt(tokens[0]);
-				String name = tokens[1];
-				String path = tokens[2];
-				String author = tokens[3];
-				String subject= tokens[4];
-				String description= tokens[5];
-				String date= tokens[6];
-				String extension= tokens[7];
-				Boolean active = Boolean.parseBoolean(tokens[8]);
-				
-				filesInfo.add(new FileDetails(index,path,name,author,subject,description,date,extension,active));
-				
-				
-				line = br.readLine();
-			}
-			
-		} 
-		catch (IOException e) 
-		{
-            System.out.println("IO Error occured trying to read from local database");
-		}
-	
-		
-	}*/
-	/*
-	private  void saveFileDetails(FileDetails newFile) 
-	{
-		StringBuilder details = new StringBuilder(newFile.toString());
-		BufferedWriter bw = null;
-		File file = null;
-		try 
-		{
-			
-			file = new File(fileDetailsPath);
-			FileWriter fw;
-			if (!file.exists()) 
-			{
-			     file.createNewFile();
-			}	
-			fw = new FileWriter(file,true);
-			
-			bw = new BufferedWriter(fw);
-			bw.append(details);
-			bw.newLine();
-		} 
-		catch (IOException e) 
-		{
-			
-			
-            System.out.println("IO Error occured trying to add to local database");
-		}
-		finally
-		{
-			try
-			{
-				if(bw!=null)
-					bw.close();
-			}
-			catch(Exception ex)
-			{
-				System.out.println("Error in closing the BufferedWriter"+ex);
-			}
-		}
-		
-		
-	}*/
 	
 	/**
 	 * A method that gets the query from the view and returns the links associated
@@ -274,15 +186,13 @@ public class Controller
 			
 			
 		} 
-		catch (NoResultsException e) 
-		{
-			throw new NoResultsException("Search returned no results!");
-		}
+		
 		catch (Exception e) 
 		{
 			throw new NoResultsException("Search returned no results!");
 		}
-		
+		if (links.size()==0)
+			throw new NoResultsException("Search returned no results!");
 		return links;
 	
 	}

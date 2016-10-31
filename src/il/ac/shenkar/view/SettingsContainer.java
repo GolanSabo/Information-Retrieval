@@ -14,6 +14,8 @@ import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
@@ -34,7 +36,7 @@ import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.border.EtchedBorder;
 
-public class SettingsContainer  extends JPanel implements ActionListener{
+public class SettingsContainer  extends JPanel implements ActionListener, MouseListener{
 	final static int extraWindowWidth = 120;
 	private JLabel lAuthor;
 	private JTextField author;
@@ -63,12 +65,13 @@ public class SettingsContainer  extends JPanel implements ActionListener{
 	private JPanel card1;
 	private JPanel card2;
 	private JPanel card3;
-	private JComboBox batchTime;
+	private JComboBox<String> batchTime;
 	private JTextPane lBatchTime;
 	private JTextPane explanation;
 	private String[] batch = {"20 seconds","5 minutes","20 minutes","1 hour","24 hours"};
 	private JButton saveBatch;
 	private JPanel radioPanel;
+	private JLabel currentVisibility;
 	
 	public SettingsContainer()
 	{
@@ -83,7 +86,8 @@ public class SettingsContainer  extends JPanel implements ActionListener{
 		searchFile = new JButton();
 		searchFile.setIcon(new ImageIcon("Search.png"));
 		searchFile.addActionListener(this);
-		documents = new JComboBox(Controller.getInstance().getDocumentsNames());
+		documents = new JComboBox<String>(Controller.getInstance().getDocumentsNames());
+		documents.addActionListener(this);
 		lName = new JLabel("Document name: ");
 		name = new JTextField(20);
 		lSubject = new JLabel("Subject: ");
@@ -103,7 +107,7 @@ public class SettingsContainer  extends JPanel implements ActionListener{
 		radioList = new ButtonGroup();
 		save = new JButton("save"); 
 		save.addActionListener(this);
-		batchTime = new JComboBox(batch);
+		batchTime = new JComboBox<String>(batch);
 		lBatchTime = new JTextPane();
 		lBatchTime.setText("Please select how often will the system"
 				+ "\n look in database for new uploaded files");
@@ -154,6 +158,7 @@ public class SettingsContainer  extends JPanel implements ActionListener{
 			}
 		};
 		tabbedPane = new JTabbedPane();
+		currentVisibility = new JLabel();
 		createSettings();
 	}
 
@@ -239,7 +244,7 @@ public class SettingsContainer  extends JPanel implements ActionListener{
 		
 		container.setLayout(new GridBagLayout());
 
-		c.gridx = 0;
+		c.gridx = 1;
 		c.gridy = 0;
 
 		c.fill = GridBagConstraints.HORIZONTAL;
@@ -248,14 +253,21 @@ public class SettingsContainer  extends JPanel implements ActionListener{
 		c.gridx = 0;
 		c.gridy = 1;
 
-		c.fill = GridBagConstraints.HORIZONTAL;
+		c.insets  = new Insets(5,5,5,5);
 		container.add(lChoose,c);
 
 		c.gridx = 1;
 		c.gridy = 1;
-
+		
 
 		container.add(documents,c);
+		c.gridx = 2;
+		c.gridy = 1;
+		currentVisibility.setText("Currently: " + 
+		Controller.getInstance().checkVisibility((String)documents.getSelectedItem()));
+		container.add(currentVisibility,c);
+
+		
 		
 		radioList.add(visible);
 		radioList.add(hidden);
@@ -267,21 +279,18 @@ public class SettingsContainer  extends JPanel implements ActionListener{
 		
 		c.gridx = 1;
 		c.gridy = 3;
-		// c.fill = GridBagConstraints.HORIZONTAL;
 		container.add(radioPanel, c);
-		c.gridx = 0;
+		c.gridx = 2;
 		c.gridy = 4;
 		c.fill = GridBagConstraints.NONE;
 		container.add(save,c);
 		
 		card2.add(container);
-		
-
-		
-		
+	
 		card3.add(lBatchTime);
 		card3.add(batchTime);
 		card3.add(saveBatch);
+		tabbedPane.addMouseListener(this);
 		tabbedPane.addTab("Load File", card1);
 		tabbedPane.addTab("Privacy", card2);
 		tabbedPane.add("Administrator", card3);
@@ -346,6 +355,12 @@ public class SettingsContainer  extends JPanel implements ActionListener{
 			
 			Controller.getInstance().setBatch((String)batchTime.getSelectedItem());
 		}
+		else if(e.getSource()==documents)
+		{
+			currentVisibility.setText("Currently: " + 
+		Controller.getInstance().checkVisibility((String)documents.getSelectedItem()));
+
+		}
 
 		repaint();
 
@@ -358,6 +373,56 @@ public class SettingsContainer  extends JPanel implements ActionListener{
 		setVisible(true);
 
 
+	}
+
+	@Override
+	public void mouseClicked(MouseEvent e) {
+		if(e.getSource()==tabbedPane && e.getButton()==MouseEvent.BUTTON3)
+		{
+			if(tabbedPane.getSelectedIndex()==0)
+			{
+				JOptionPane.showMessageDialog(this,"This tab is used to load a file to \n"
+					+ "the search engine database."
+					, "Load File",JOptionPane.INFORMATION_MESSAGE);
+			}
+			else if(tabbedPane.getSelectedIndex()==1)
+			{
+				JOptionPane.showMessageDialog(this,"This tab is used set the file\n"
+					+ "visibility."
+					, "Privacy",JOptionPane.INFORMATION_MESSAGE);
+			}
+			else if(tabbedPane.getSelectedIndex()==2)
+			{
+				JOptionPane.showMessageDialog(this,"This tab is used to set how frequent  \n"
+					+ "will the Engine look for new uploads to the database."
+					, "Administrator",JOptionPane.INFORMATION_MESSAGE);
+			}
+		}
+		
+	}
+
+	@Override
+	public void mouseEntered(MouseEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void mouseExited(MouseEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void mousePressed(MouseEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void mouseReleased(MouseEvent arg0) {
+		// TODO Auto-generated method stub
+		
 	}
 
 

@@ -38,8 +38,8 @@ public class MainView extends JFrame implements ActionListener
 	private SettingsContainer settings; 
 	private JPanel card1;
 	private JPanel card2;
-	private JPanel container;
-	private JList list;
+	private JPanel resultContainer;
+	
 	private JPanel queryPanel;
 	
 	public MainView()
@@ -98,7 +98,7 @@ public class MainView extends JFrame implements ActionListener
                 return size;
             }
         };
-		container = new JPanel(){
+		resultContainer = new JPanel(){
         	public Dimension getPreferredSize() {
                 Dimension size = super.getPreferredSize();
                 size.width += extraWindowWidth;
@@ -119,12 +119,10 @@ public void addComponentToPane(Container pane) {
         queryPanel.add(input);
         queryPanel.add(search);
         
-       // container.add(queryPanel,BorderLayout.NORTH);
+       
         body.setLayout(new BoxLayout(body, BoxLayout.Y_AXIS));
         body.setAlignmentX(LEFT_ALIGNMENT);
-       // container.add(body, BorderLayout.WEST);
-
-       // container.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
+       
         card1.add(queryPanel,BorderLayout.NORTH);
         card1.add(body,BorderLayout.WEST);
         card2.add(settings);

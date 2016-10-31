@@ -301,6 +301,21 @@ public class Controller
 		this.fileMonitor = fileMonitor;
 	}
 
+	public String checkVisibility(String fileName) 
+	{
+		for(FileDetails fd: filesInfo)
+		{
+			if(fd.getDocumentName().equals(fileName))
+			{
+				if (fd.isActive())
+					return "Visible";
+				else 
+					return "Hidden";
+			}
+		}
+		return null;
+	}
+
 
 
 	

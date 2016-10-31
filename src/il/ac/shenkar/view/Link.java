@@ -123,7 +123,11 @@ public class Link extends JPanel implements MouseListener
 		if(type==ResultType.DOCUMENT)
 		{
 			if(description.equals(""))
-				pane.setText(get3Lines());
+			{
+				description = get3Lines();
+				fileDetails.setDescription(description);
+				pane.setText(description);
+			}
 			else
 				pane.setText(description);
 		}
@@ -139,7 +143,7 @@ public class Link extends JPanel implements MouseListener
 
 
 
-	private String get3Lines() {
+	public String get3Lines() {
 		StringBuilder textData;
 		textData = new StringBuilder();
 

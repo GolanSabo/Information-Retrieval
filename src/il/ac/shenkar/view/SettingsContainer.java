@@ -115,7 +115,7 @@ public class SettingsContainer  extends JPanel implements ActionListener, MouseL
 		lBatchTime.setBackground(Color.lightGray);
 		
 		explanation = new JTextPane();
-		explanation.setText("This field is used to include/exclude "
+		explanation.setText("This tab is used to include/exclude "
 				+ "\nfiles from database");
 				
 		explanation.setEditable(false);
@@ -347,8 +347,14 @@ public class SettingsContainer  extends JPanel implements ActionListener, MouseL
 		}
 		else if(e.getSource()==save )
 		{
+			if(!visible.isSelected() && !hidden.isSelected())
+				return;
 			String docName = (String)documents.getSelectedItem();
 			Controller.getInstance().changeVisibility(docName,visible.isSelected());
+			currentVisibility.setText("Currently: " + 
+					Controller.getInstance().checkVisibility((String)documents.getSelectedItem()));
+
+			
 		}
 		else if(e.getSource()==saveBatch)
 		{
@@ -377,6 +383,23 @@ public class SettingsContainer  extends JPanel implements ActionListener, MouseL
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
+				
+	}
+
+	@Override
+	public void mouseEntered(MouseEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void mouseExited(MouseEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void mousePressed(MouseEvent e) {
 		if(e.getSource()==tabbedPane && e.getButton()==MouseEvent.BUTTON3)
 		{
 			if(tabbedPane.getSelectedIndex()==0)
@@ -398,24 +421,7 @@ public class SettingsContainer  extends JPanel implements ActionListener, MouseL
 					, "Administrator",JOptionPane.INFORMATION_MESSAGE);
 			}
 		}
-		
-	}
 
-	@Override
-	public void mouseEntered(MouseEvent arg0) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void mouseExited(MouseEvent arg0) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void mousePressed(MouseEvent arg0) {
-		// TODO Auto-generated method stub
 		
 	}
 

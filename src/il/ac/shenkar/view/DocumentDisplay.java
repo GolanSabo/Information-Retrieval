@@ -35,14 +35,19 @@ public class DocumentDisplay extends JFrame implements ActionListener, ILinkDisp
 	private String path;
 	private String author;
 	private String subject;
+	private String description;
 	private String date;
+	private String title;
 	private JPanel detailsPanel;
 	public DocumentDisplay(FileDetails fd, ArrayList<Integer> _locations)
 	{
+		title = fd.getDocumentName();
 		path = fd.getPath();
 		locations = _locations;
 		author = fd.getAuthor();
 		subject = fd.getSubject();
+		description = fd.getDescription();
+		
 		date = fd.getDate().toString();
 		textArea = new JPanel();
 		tPane = new JTextPane();
@@ -68,15 +73,23 @@ public class DocumentDisplay extends JFrame implements ActionListener, ILinkDisp
 		scrollpane = new JScrollPane(tPane);
 		detailsPanel = new JPanel();
 		detailsPane = new JTextPane();
+		
+		
 		setDetailsPanel();
+		detailsPane.setEditable(false);
 		getPages();
 		
 	}
 	
 	private void setDetailsPanel() 
 	{
-		
-		
+		StringBuilder sb = new StringBuilder();
+		sb.append("Title: " + title + "\n" 
+				+ "Author: " + author + "\n"
+				+ "Subject: " + subject + "\n"
+				+ "Description: " + description + "\n"
+				+ "Published: " + date + "\n");
+		detailsPane.setText(sb.toString());
 	}
 
 	public void createDisplay()
@@ -109,30 +122,7 @@ public class DocumentDisplay extends JFrame implements ActionListener, ILinkDisp
 			appendToPane(tPane,"\n", Color.black);
 		}
 				
-		/*{
-			ArrayList<String> words = temp.getData();
-			for(String word:words)
-			{
-				charCounter+=word.length();
-				if (charCounter>=125)
-				{
-					charCounter = word.length();
-					appendToPane(tPane, "\n", Color.black);
-					
-				}
-				if(locations.contains(wordCounter))
-				{
-					appendToPane(tPane, word+ " ", Color.yellow);
-				}
-				else
-				{
-					appendToPane(tPane, word+ " ", Color.black);
-				}
-				wordCounter++;
-				
-			}*/
-			
-		
+		tPane.setEditable(false);
 		textArea.add(scrollpane);
 		add(textArea,BorderLayout.CENTER);
 		
@@ -150,6 +140,8 @@ public class DocumentDisplay extends JFrame implements ActionListener, ILinkDisp
 			next.setEnabled(true);
 		bottomPanel.add(next);
 		add(bottomPanel,BorderLayout.SOUTH);
+		detailsPanel.add(detailsPane);
+		add(detailsPanel,BorderLayout.WEST);
 		setVisible(true);
 		pack();
 	}

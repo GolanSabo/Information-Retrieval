@@ -29,7 +29,9 @@ public class MainView extends JFrame implements ActionListener
 	private JTextField input;
 	private JButton search;
 	private JPanel body;
-	
+	private int numberOfResults=0;
+	private int pages=0;
+	private int page = 1;
 	private Vector<Link> links;
 	private JButton back;
 	private JButton next;
@@ -39,6 +41,9 @@ public class MainView extends JFrame implements ActionListener
 	private JPanel card1;
 	private JPanel card2;
 	private JPanel resultContainer;
+	private JPanel bottomPanel;
+	private JTextField changePage;
+	private JLabel numberOfPages;
 	
 	private JPanel queryPanel;
 	
@@ -46,23 +51,51 @@ public class MainView extends JFrame implements ActionListener
 	{
 		Controller.getInstance().init();
 		input = new JTextField(20);
+		input.addActionListener(this);
 		search = new JButton();
 		search.setIcon(new ImageIcon("Search.png"));
 		search.addActionListener(this);
 		body = new JPanel();
 		back = new JButton();
 		back.setIcon(new ImageIcon("Back.png"));
+		back.addActionListener(this);
 		next = new JButton();
 		next.setIcon(new ImageIcon("Next.png"));
+		next.addActionListener(this);
 		links = new Vector<Link>();
-		
+		changePage = new JTextField(2);
+		changePage.addActionListener(this);
+		numberOfPages = new JLabel("");
 		tabbedPaneContainer = new JPanel();
 		settings = new SettingsContainer();
-		
+		bottomPanel = new JPanel();
 		tabbedPane = new JTabbedPane();
 		queryPanel = new JPanel();
-        
-		
+		bottomPanel.setVisible(false);
+		card1 = new JPanel() {
+
+			public Dimension getPreferredSize() {
+				Dimension size = super.getPreferredSize();
+				size.width += extraWindowWidth;
+				return size;
+			}
+		};
+		card2 = new JPanel(){
+			public Dimension getPreferredSize() {
+				Dimension size = super.getPreferredSize();
+				size.width += extraWindowWidth;
+				return size;
+			}
+		};
+		resultContainer = new JPanel(){
+			public Dimension getPreferredSize() {
+				Dimension size = super.getPreferredSize();
+				size.width += extraWindowWidth;
+				return size;
+			}
+		};
+
+
 	}
 	
 	
@@ -70,9 +103,6 @@ public class MainView extends JFrame implements ActionListener
 	{
 		
 		setTitle("My Search Engine");
-		
-		
-		
 		addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent ev)
 			{
@@ -83,28 +113,7 @@ public class MainView extends JFrame implements ActionListener
 			}
 		});
 		
-		card1 = new JPanel() {
-            
-            public Dimension getPreferredSize() {
-                Dimension size = super.getPreferredSize();
-                size.width += extraWindowWidth;
-                return size;
-            }
-        };
-        card2 = new JPanel(){
-        	public Dimension getPreferredSize() {
-                Dimension size = super.getPreferredSize();
-                size.width += extraWindowWidth;
-                return size;
-            }
-        };
-		resultContainer = new JPanel(){
-        	public Dimension getPreferredSize() {
-                Dimension size = super.getPreferredSize();
-                size.width += extraWindowWidth;
-                return size;
-            }
-        };
+		
 		addComponentToPane(tabbedPaneContainer);
 		add(tabbedPane,BorderLayout.CENTER);
 		setVisible(true);
@@ -122,9 +131,23 @@ public void addComponentToPane(Container pane) {
        
         body.setLayout(new BoxLayout(body, BoxLayout.Y_AXIS));
         body.setAlignmentX(LEFT_ALIGNMENT);
-       
+        bottomPanel.add(back);
+		if(page<=1)
+			bottomPanel.remove(back);
+		
+		repaint();
+		changePage.setText(""+page);
+		bottomPanel.add(changePage);
+		bottomPanel.add(numberOfPages);
+		bottomPanel.add(next);
+		if(page==pages)
+			bottomPanel.remove(next);
+		
+		
         card1.add(queryPanel,BorderLayout.NORTH);
         card1.add(body,BorderLayout.WEST);
+     
+        card1.add(bottomPanel, BorderLayout.SOUTH);
         card2.add(settings);
  
         tabbedPane.addTab("Search", card1);
@@ -141,19 +164,53 @@ public void addComponentToPane(Container pane) {
 		if( event.getSource()==search || event.getSource()==input)
 		{
 			try {
+				bottomPanel.setVisible(true);
+				page=1;
 				links = Controller.getInstance().getResults(input.getText());
+				numberOfResults = links.size();
+				if(numberOfResults%4==0)
+					pages = numberOfResults/4; 
+				else
+					pages = pages = numberOfResults/4+1;
+				numberOfPages.setText("/ "+Integer.toString(pages));
+				addLinksToPanel();
 			} catch (NoResultsException e) {
+				bottomPanel.setVisible(false);
 				JOptionPane.showMessageDialog(this,"Search returned no results\n"
 						, "No results",JOptionPane.ERROR_MESSAGE);
 			}
-			body.removeAll();
-			for(Link link:links)
-			{
-				body.add(link);
-			}
 			
-			repaint();
+			
 		}
+		if(event.getSource()==back)
+		{
+			page--;
+			addLinksToPanel();
+		}
+		if(event.getSource()==next)
+		{
+			page++;
+			addLinksToPanel();
+		}
+		
+	}
+
+
+	private void addLinksToPanel() 
+	{
+		body.removeAll();
+		int offset = page*4-4;
+		int linksToAdd = 4;
+		if(page==pages)
+			linksToAdd = numberOfResults%4;
+		if(linksToAdd==0)
+			linksToAdd=4;
+		for(int i=0;i<linksToAdd;++i)
+		{
+			body.add(links.elementAt(offset));
+			offset++;
+		}
+		createMainView();
 		
 	}
 	

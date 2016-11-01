@@ -220,9 +220,19 @@ public class Link extends JPanel implements MouseListener
 	public void mousePressed(MouseEvent e) {
 		if(type == ResultType.DOCUMENT)
 		{
-			DocumentDisplay display = new DocumentDisplay(getFileDetails(),getLocations());
-			display.setTitle(documentName.getText());
-			display.createDisplay();
+			if(fileDetails.getExtension().equals(".txt"))
+			{
+				TextDocumentDisplay display = new TextDocumentDisplay(getFileDetails(),getLocations());
+				display.setTitle(documentName.getText());
+				display.createDisplay();
+			}
+			else if(fileDetails.getExtension().equals(".pdf"))
+			{
+				PDFDocumentDisplay display = new PDFDocumentDisplay(getFileDetails(),getLocations());
+				display.setTitle(documentName.getText());
+				display.createDisplay();
+			}
+			
 		}
 		else if(type == ResultType.IMAGE)
 		{

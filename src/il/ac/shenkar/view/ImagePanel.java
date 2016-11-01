@@ -27,4 +27,12 @@ public class ImagePanel extends JPanel{
         g.drawImage(image, 0, 0, this);            
     }
 
+	public BufferedImage getImage() {
+		return image;
+	}
+
+	public void setImage(BufferedImage image) {
+		this.image = image;
+	}
+
 }

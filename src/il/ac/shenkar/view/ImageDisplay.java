@@ -33,4 +33,6 @@ public class ImageDisplay extends JFrame implements ActionListener, ILinkDisplay
 		
 	}
 
+	
+
 }

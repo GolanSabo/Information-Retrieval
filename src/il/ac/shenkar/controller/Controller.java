@@ -31,24 +31,44 @@ import il.ac.shenkar.errors.NoResultsException;
 import il.ac.shenkar.view.Link;
 import il.ac.shenkar.view.MainView;
 
-
+/**
+ * The Controller class is responsible to coordinate between the 
+ *view and the model
+ */
 public class Controller 
 {
-	public enum ResultType {DOCUMENT, IMAGE, SOUND};
+	/**
+	 * An enum to represent the type of document
+	 */
+	public enum ResultType {DOCUMENT, IMAGE};
+	
 	private  final String sourceFolderPath = "./SourceFolder";
+	
 	private  final String storageFolderPath = "./StorageFolder";
+	
 	private  final String detailsPath = "./FileDetailsStorage";
+	
+	//A list that contains text document extensions
 	private final ArrayList<String> documentExtension = 
-			new ArrayList<String>(Arrays.asList(".txt",".doc",".pdf"));
+			new ArrayList<String>(Arrays.asList(".txt",".doc",".pdf"));	
+	
+	//A list that contains image document extensions
 	private final ArrayList<String> imageExtension = 
 			new ArrayList<String>(Arrays.asList(".png",".jpg",".bmp", ".gif"));
-	private final ArrayList<String> soundExtension = 
-			new ArrayList<String>(Arrays.asList("wav","mp3"));
+	
+	//A list that holds the file details of the documents in database
 	private  ArrayList<FileDetails> filesInfo = new ArrayList<FileDetails>();
+	
+	//The main view reference
 	private MainView view;
+	
+	//Monitors the files in the source folder 
 	private FileMonitor fileMonitor;
+	
+	//The only instance of the controller
 	private static Controller _instance = null;
 	
+	//Basic constructor
 	private Controller(){}
 	
 	/**
@@ -61,7 +81,8 @@ public class Controller
 			_instance = new Controller();
 		return _instance;
 	}
-
+	
+	
 	/**
 	 * A method that returns the document names in database
 	 * @return A vector of document names in database
@@ -93,7 +114,7 @@ public class Controller
 	}
 	
 	/**
-	 * Stores the file details as received from the GUI
+	 * Stores the file details as received from the GUI in the source folder
 	 * @param filePath
 	 * @param docName
 	 * @param _author
@@ -111,21 +132,26 @@ public class Controller
 		File source = new File(filePath);
 		if(!source.exists())
 			throw new FilePathException("File Does not exist");
-		
 		Path src = Paths.get(filePath);
 		
+		//Checks if the file name exists in database - if so, throws exception 
 		checkDocumentsIfNameExists(docName);
+		
 		String extension  = getExtension(filePath);
 		Path dest = Paths.get(sourceFolderPath+"/"+ docName + extension);
 		int index = FileUtils.readIndex();
 		FileUtils.writeIndex(index);
 		FileDetails newFile = new FileDetails(index,dest.toString(), docName, _author, 
 				_subject, _description, _date, extension,true);
+		
+		//Add the file details to the list and then save as serializable 
 		filesInfo.add(newFile);
 		FileUtils.SaveToFile(filesInfo, "fileDetails.ser", detailsPath);
 		
-			Files.copy(src, dest, StandardCopyOption.REPLACE_EXISTING);
+		//Move the file to the source folder
+		Files.copy(src, dest, StandardCopyOption.REPLACE_EXISTING);
 		
+
 	}
 	
 	/*
@@ -165,7 +191,7 @@ public class Controller
 	 * @return - a vector of Links
 	 * @throws NoResultsException - Thrown when there are no results
 	 */
-	public  Vector<Link> getResults(String query) throws NoResultsException
+	public  Vector<Link> getSearchResults(String query) throws NoResultsException
 	{
 		
 		Vector<Link> links=null;
@@ -174,25 +200,28 @@ public class Controller
 		{
 			links = new Vector<Link>();
 			ArrayList<SearchResult> results = new ArrayList<SearchResult>();
+			long begin = System.currentTimeMillis();
 			results = Searcher.SearchWord(query);
-
+			long end = System.currentTimeMillis();
+			
+			view.setSearchTime(end-begin, results.size());
 			for(SearchResult result: results)
 			{
 				result.getFileDetails().setPath(storageFolderPath + "/" + 
 			result.getFileDetails().getDocumentName() + result.getFileDetails().getExtension());
+				
+				//Get the type of document and create a link based on the type
 				ResultType type = getResultType(result.getFileDetails().getExtension());
 				links.addElement(new Link(result,type));	
-			}
-			
-			
+			}	
+			if (links.size()==0)
+				throw new NoResultsException("Search returned no results!");
 		} 
-		
 		catch (Exception e) 
 		{
-			throw new NoResultsException("Search returned no results!");
+			throw new NoResultsException(e.getMessage());
 		}
-		if (links.size()==0)
-			throw new NoResultsException("Search returned no results!");
+		
 		return links;
 	
 	}
@@ -224,7 +253,6 @@ public class Controller
 		}
 		try {
 			FileUtils.SaveToFile(filesInfo, "fileDetails.ser", detailsPath);
-			//filesInfo = FileUtils.loadFileDetailsFromFile(detailsPath + "fileDetails.ser");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -258,12 +286,17 @@ public class Controller
 	 */
 	public void init()
 	{
-		fileMonitor = new FileMonitor(20 * 1000);
+		fileMonitor = new FileMonitor();
 		fileMonitor.start();
 		loadFileDetailsFromDatabase();
 		
 	}
 	
+	/**
+	 * A method to check if the file is active based on file index
+	 * @param fileIndex
+	 * @return true if active, false otherwise
+	 */
 	public boolean checkIfFileIsActive(int fileIndex)
 	{
 		for(FileDetails fd: filesInfo)
@@ -274,33 +307,11 @@ public class Controller
 		return false;
 	}
 	
-	public ArrayList<FileDetails> getFilesInfo() {
-		return filesInfo;
-	}
-
-	public void setFilesInfo(ArrayList<FileDetails> filesInfo) {
-		this.filesInfo = filesInfo;
-	}
-
-	public MainView getView() {
-		return view;
-	}
-
-
-	public void setView(MainView view) {
-		this.view = view;
-	}
-
-
-	public FileMonitor getFileMonitor() {
-		return fileMonitor;
-	}
-
-
-	public void setFileMonitor(FileMonitor fileMonitor) {
-		this.fileMonitor = fileMonitor;
-	}
-
+	/**
+	 * A method to check the visibility given a string of the file name
+	 * @param fileName - the file name given by the view
+	 * @return - "Visible" if visible, "Hidden" otherwise
+	 */
 	public String checkVisibility(String fileName) 
 	{
 		for(FileDetails fd: filesInfo)
@@ -315,6 +326,56 @@ public class Controller
 		}
 		return null;
 	}
+	
+	/**
+	 * A getter for the file details list
+	 * @return The filesInfo list
+	 */
+	public ArrayList<FileDetails> getFilesInfo() {
+		return filesInfo;
+	}
+
+	/**
+	 * A setter for the file details list
+	 * @param The filesInfo list
+	 */
+	public void setFilesInfo(ArrayList<FileDetails> filesInfo) {
+		this.filesInfo = filesInfo;
+	}
+
+	/**
+	 *  A getter for the view
+	 * @return the view
+	 */
+	public MainView getView() {
+		return view;
+	}
+
+	/**
+	 * A setter for the view
+	 * @param view - the main view
+	 */
+	public void setView(MainView view) {
+		this.view = view;
+	}
+
+	/**
+	 * A getter for the file monitor
+	 * @return - the file monitor
+	 */
+	public FileMonitor getFileMonitor() {
+		return fileMonitor;
+	}
+
+	/**
+	 * A setter for the monitor
+	 * @param fileMonitor
+	 */
+	public void setFileMonitor(FileMonitor fileMonitor) {
+		this.fileMonitor = fileMonitor;
+	}
+
+	
 
 
 

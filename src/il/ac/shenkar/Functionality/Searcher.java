@@ -1,5 +1,6 @@
 package il.ac.shenkar.Functionality;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -7,20 +8,29 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 
-import il.ac.shenkar.Details.FileDetails;
 import il.ac.shenkar.Details.Node;
 import il.ac.shenkar.FileMonitor.FileMonitor;
 import il.ac.shenkar.Utils.FileUtils;
+import il.ac.shenkar.Utils.PrinterUtils;
 import il.ac.shenkar.controller.Controller;
 
 public class Searcher {
 
 	private final static String fileName = "./conf/invertedFile.ser";
 	private static int nextWordIndex = 0;
-	private static Map invertedFile = FileUtils.LoadFromFile(fileName);
+	private static Map invertedFile;
 	private static int notFlag = 0;
 
 	public static ArrayList<SearchResult> SearchWord(String query) throws Exception {
+
+			if(new File(fileName).exists()){		
+			
+				invertedFile = FileUtils.LoadFromFile(fileName);
+				PrinterUtils.PrintMap(invertedFile);
+			}
+			else
+				throw new Exception("No files in database!");
+
 		query = query.toLowerCase();
 		while(FileMonitor.isActive()){
 			System.out.println("Wait for Batch Job To End");
@@ -93,8 +103,8 @@ public class Searcher {
 						if(list.get(k).getFileIndex() == count.get(j))
 							list.remove(k);
 				}
-				for(int j = 0; j < tmp.size(); ++j)
-					list.add(tmp.get(j));
+//				for(int j = 0; j < tmp.size(); ++j)
+//					list.add(tmp.get(j));
 
 				break;
 			case "not":
@@ -124,6 +134,7 @@ public class Searcher {
 						break;
 					}
 					tmp = (ArrayList<Node>) invertedFile.get(words[i]);
+					notFlag = 0;
 				}
 
 				list.addAll(logicalNot(tmp,invertedFile));
@@ -302,23 +313,28 @@ public class Searcher {
 			match = false;
 			for(int j = 0; j < result.size(); ++j){
 				if(tmp.getFileDetails() == result.get(j).getFileDetails()){
-					result.get(j).addLocations(tmp.getLocations());
+					ArrayList<Integer> l = tmp.getLocations();
+					for(int k = 0; k < l.size(); ++k){
+						int x = l.get(k);
+						result.get(j).addLocations(x);
+					}
 					match = true;
 				}
 			}
 			if(!match){
+				ArrayList<Integer> l = tmp.getLocations();
+				SearchResult searchResult = new SearchResult(tmp.getFileDetails());
+				for(int k = 0; k < l.size(); ++k){
+					int x = l.get(k);
+					searchResult.addLocations(x);
+				}
 				if(Controller.getInstance().checkIfFileIsActive(tmp.getFileDetails().getIndex()))
-					result.add(new SearchResult(tmp.getFileDetails(), tmp.getLocations()));
+					result.add(searchResult);
 			}
 		}
 		System.out.println("Before sorting \n" + result);
 		Collections.sort(result);
-		for(SearchResult s: result)
-			Collections.sort(s.getLocations());
 		System.out.println("After sorting \n" + result);
 		return result;
 	}
-
-
-	
 }

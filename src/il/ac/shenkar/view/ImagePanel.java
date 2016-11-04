@@ -9,8 +9,12 @@ import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
+/**
+ * A class that represents image panel - to be used in image display
+ */
 public class ImagePanel extends JPanel{
 
+	//The image
     private BufferedImage image;
 
     public ImagePanel(String path) {

@@ -4,28 +4,54 @@ import il.ac.shenkar.FileParser.FileParser;
 import il.ac.shenkar.Utils.FileUtils;
 import il.ac.shenkar.Utils.MapUtils;
 
+import java.io.BufferedReader;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 /**
  * FileMonitor is responsible of scanning source folder every X sec in order to parse new files into inverted file
  * 
  */
 public class FileMonitor extends Thread{
-	
+
 
 	private final String sourceFolderPath = "./SourceFolder";
 	private final String InvertedFolderPath = "./InvertedFile";
+	private final File batchFile = new File("./conf/batchDelay.txt");
 	private long batchTime;
 	private static boolean active = false;
-	
+
 	/**
 	 * constructor
 	 * @param batchTime - specify the delay (in millisec) between batch jobs  
 	 */
-	public FileMonitor(long batchTime) {
+	public FileMonitor() {
 		super();
-		this.batchTime = batchTime;
+		if(batchFile.exists()){
+			BufferedReader br = null;
+			try {
+				String sCurrentLine;
+
+				br = new BufferedReader(new FileReader(batchFile));
+
+				sCurrentLine = br.readLine();
+					batchTime = Long.parseLong(sCurrentLine);
+				br.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+			
 	}
-	
+
+
 	/**
 	 * 
 	 * @return true - if a batch job is currently active
@@ -52,12 +78,12 @@ public class FileMonitor extends Thread{
 				/*
 				 * this for loop Merges the inverted files of the new files into the main inverted file and delete 
 				 * the temporary inverted files
-				*/
+				 */
 				for (int i = 0; i < listOfFiles.length; ++i) {
 					MapUtils.MergeMaps(FileUtils.LoadFromFile(listOfFiles[i].getAbsolutePath()));
 					listOfFiles[i].delete();
-				
-			}
+
+				}
 			}
 			try {
 				/*wait for next batch*/
@@ -67,13 +93,28 @@ public class FileMonitor extends Thread{
 				e.printStackTrace();
 			}
 		}
-		
+
 	}
 	public long getBatchTime() {
 		return batchTime;
 	}
 
 	public void setBatchTime(long batchTime) {
+		if(batchTime < 0)
+			return;
+		File f = batchFile;
+		try {
+			if(!f.exists())
+				f.createNewFile();
+			DataOutputStream dos = new DataOutputStream(new FileOutputStream(f));
+			dos.writeLong(batchTime);
+			dos.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+
 		this.batchTime = batchTime;
 	}
 

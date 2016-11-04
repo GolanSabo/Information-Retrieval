@@ -7,7 +7,9 @@ import java.awt.event.ActionListener;
 
 import javax.swing.*;
 
-
+/**
+ *  A class that represents an image link 
+ */
 public class ImageDisplay extends JFrame implements ActionListener, ILinkDisplay
 {
 	private ImagePanel image;

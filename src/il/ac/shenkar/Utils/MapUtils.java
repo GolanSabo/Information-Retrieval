@@ -14,9 +14,10 @@ public class MapUtils {
 	/**
 	 * merges map of the temporary inverted file into the map of the main inverted file (contains all inverted files)
 	 * @param map - the map to merge into the main map
+	 * @throws Exception 
 	 */
 	@SuppressWarnings("rawtypes")
-	public static void MergeMaps(Map<String,Node> map){
+	public static void MergeMaps(Map<String,Node> map) {
 		File file = new File("./conf/invertedFile.ser");
 		HashMap<String,ArrayList<Node>> invertedFile;
 		

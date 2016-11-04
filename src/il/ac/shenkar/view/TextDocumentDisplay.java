@@ -4,11 +4,20 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Graphics;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.print.PageFormat;
+import java.awt.print.Printable;
+import java.awt.print.PrinterException;
+import java.awt.print.PrinterJob;
 import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
@@ -17,6 +26,18 @@ import javax.swing.text.*;
 
 import il.ac.shenkar.Details.FileDetails;
 
+import javax.print.Doc;
+import javax.print.DocFlavor;
+import javax.print.DocPrintJob;
+import javax.print.PrintException;
+import javax.print.PrintService;
+import javax.print.PrintServiceLookup;
+import javax.print.SimpleDoc;
+import javax.print.attribute.HashPrintRequestAttributeSet;
+import javax.print.attribute.PrintRequestAttributeSet;
+import javax.print.attribute.standard.Copies;
+import javax.print.attribute.standard.MediaSize;
+import javax.print.attribute.standard.MediaSizeName;
 import javax.swing.*;
 
 public class TextDocumentDisplay extends JFrame implements ActionListener, MouseListener
@@ -25,7 +46,7 @@ public class TextDocumentDisplay extends JFrame implements ActionListener, Mouse
 	
 	private int currentPage = 1;
 	private JTextPane tPane;
-	private JPanel textArea;
+	private JPanel documentPanel;
 	private JTextPane detailsPane;
 	private String text;
 	private ArrayList<Integer> locations;
@@ -37,14 +58,6 @@ public class TextDocumentDisplay extends JFrame implements ActionListener, Mouse
 	//private JLabel numberOfPages;
 	private JScrollPane scrollpane;
 	private String path;
-	public String getPath() {
-		return path;
-	}
-
-	public void setPath(String path) {
-		this.path = path;
-	}
-
 	private String author;
 	private String subject;
 	private String description;
@@ -52,6 +65,7 @@ public class TextDocumentDisplay extends JFrame implements ActionListener, Mouse
 	private String title;
 	private JPanel detailsPanel;
 	private JButton showDetails;
+	private JButton print;
 	public TextDocumentDisplay(FileDetails fd, ArrayList<Integer> _locations)
 	{
 		title = fd.getDocumentName();
@@ -62,7 +76,7 @@ public class TextDocumentDisplay extends JFrame implements ActionListener, Mouse
 		description = fd.getDescription();
 		
 		date = fd.getDate().toString();
-		textArea = new JPanel();
+		documentPanel = new JPanel();
 		tPane = new JTextPane();
 		//back = new JButton();
 		//next = new JButton();
@@ -90,6 +104,8 @@ public class TextDocumentDisplay extends JFrame implements ActionListener, Mouse
 		detailsPane.setEditable(false);
 		showDetails = new JButton("Details");
 		showDetails.addActionListener(this);
+		print = new JButton("Print");
+		print.addActionListener(this);
 		//scrollpane = new JScrollPane(tPane);
 		this.addMouseListener(this);
 		//getPages();
@@ -116,7 +132,7 @@ public class TextDocumentDisplay extends JFrame implements ActionListener, Mouse
 		{
 			if(locations.contains(wordCounter))
 			{
-				appendToPane(tPane, word+ " ", Color.yellow);
+				appendToPane(tPane, word+ " ", Color.red);
 			}
 			else
 			{
@@ -133,17 +149,18 @@ public class TextDocumentDisplay extends JFrame implements ActionListener, Mouse
 	public void createDisplay()
 	{
 		
-		this.setPreferredSize(new Dimension(1000,380));
+		this.setPreferredSize(new Dimension(500,380));
 		
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		//bottomPanel.setLayout(new FlowLayout());
 		int charCounter = 0;
 				
 		//tPane.setEditable(false);
+		tPane.setMaximumSize(new Dimension(350,380));
 		scrollpane = new JScrollPane(tPane);
-		scrollpane.setMaximumSize(new Dimension(400,380));
-		textArea.add(scrollpane);
-		add(textArea,BorderLayout.CENTER);
+	//	scrollpane.setMaximumSize(new Dimension(350,380));
+		add(scrollpane,BorderLayout.CENTER);
+		//add(documentPanel,BorderLayout.CENTER);
 		
 		/*bottomPanel.add(back);
 		if(currentPage<=1)
@@ -159,7 +176,16 @@ public class TextDocumentDisplay extends JFrame implements ActionListener, Mouse
 			next.setEnabled(true);
 		bottomPanel.add(next);
 		add(bottomPanel,BorderLayout.SOUTH);
-		*/detailsPanel.add(showDetails);
+		*/
+		detailsPanel.setLayout(new GridBagLayout()); 
+		GridBagConstraints c = new GridBagConstraints();
+		c.gridx = 0;
+		c.gridy = 0;
+		c.insets = new Insets(10,10,10,10);
+		detailsPanel.add(showDetails,c);
+		c.gridx = 0;
+		c.gridy = 2;
+		detailsPanel.add(print,c);
 		add(detailsPanel,BorderLayout.WEST);
 		setVisible(true);
 		pack();
@@ -225,12 +251,45 @@ public class TextDocumentDisplay extends JFrame implements ActionListener, Mouse
 		{
 			currentPage = Integer.parseInt(changePage.getText());
 			createDisplay();
-		}
-		else if(event.getSource()==showDetails)
+		}*/
+		if(event.getSource()==showDetails)
 		{
 			JOptionPane.showMessageDialog(this,detailsPane.getText()
 					, "File Details",JOptionPane.INFORMATION_MESSAGE);
-		}*/
+		}
+		else if(event.getSource()==print)
+		{
+			// Input the file
+			FileInputStream textStream = null; 
+			try { 
+			        textStream = new FileInputStream(path); 
+			} catch (FileNotFoundException ffne) { 
+			} 
+			if (textStream == null) { 
+			        return; 
+			} 
+			// Set the document type
+			DocFlavor myFormat = DocFlavor.INPUT_STREAM.AUTOSENSE;
+			// Create a Doc
+			Doc myDoc = new SimpleDoc(textStream, myFormat, null); 
+			// Build a set of attributes
+			PrintRequestAttributeSet aset = new HashPrintRequestAttributeSet(); 
+			aset.add(new Copies(1)); 
+			aset.add(MediaSizeName.ISO_A4);
+			// discover the printers that can print the format according to the
+			// instructions in the attribute set
+			PrintService[] services =
+			        PrintServiceLookup.lookupPrintServices(myFormat, aset);
+			// Create a print job from one of the print services
+			if (services.length > 0) { 
+			        DocPrintJob job = services[0].createPrintJob(); 
+			        try { 
+			                job.print(myDoc, aset); 
+			        } catch (PrintException pe) {} 
+			} 
+		}
+		
+		
 		
 	}
 	
@@ -283,6 +342,16 @@ public class TextDocumentDisplay extends JFrame implements ActionListener, Mouse
 		return numberOfLines;
 	}
 	
+	public String getPath() {
+		return path;
+	}
+
+	public void setPath(String path) {
+		this.path = path;
+	}
+
+
+	
 	@Override
 	public void mousePressed(MouseEvent e) {
 		if(e.getButton()==MouseEvent.BUTTON3)
@@ -315,6 +384,8 @@ public class TextDocumentDisplay extends JFrame implements ActionListener, Mouse
 		// TODO Auto-generated method stub
 		
 	}
+
+	
 
 	
 }

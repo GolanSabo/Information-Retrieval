@@ -4,43 +4,29 @@ package il.ac.shenkar.view;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Cursor;
-import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-
-import javax.swing.BoxLayout;
-import javax.swing.ImageIcon;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JPanel;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
 import javax.swing.JTextPane;
-import javax.swing.SwingConstants;
-import javax.swing.border.Border;
-import javax.swing.text.AttributeSet;
-import javax.swing.text.SimpleAttributeSet;
-import javax.swing.text.StyleConstants;
-import javax.swing.text.StyleContext;
-
 import il.ac.shenkar.Details.FileDetails;
 import il.ac.shenkar.Functionality.SearchResult;
 import il.ac.shenkar.controller.Controller.ResultType;
+import il.ac.shenkar.pdf.utils.PDFHandler;
+import il.ac.shenkar.pdf.utils.PDFReader;
 
-
-
+/**
+ * A Link view as shown by the main view
+ */
 public class Link extends JPanel implements MouseListener
 {
 	private String keyword;
@@ -53,7 +39,11 @@ public class Link extends JPanel implements MouseListener
 	private ResultType type;
 	private String description;
 	
-	
+	/**
+	 * A constructor for the link 
+	 * @param result - the result sent from the searcher via the controller
+	 * @param _type - the type of document
+	 */
 	public Link(SearchResult result, ResultType _type)
 	{
 		fileDetails = result.getFileDetails();
@@ -63,16 +53,14 @@ public class Link extends JPanel implements MouseListener
 		documentName.setForeground(Color.blue);
 		documentName.setAlignmentX(JLabel.LEFT);
 		documentName.setFont(new Font(Font.SERIF,3,14));
-		 pane = new JTextPane();
-		 pane.setFont(new Font(Font.DIALOG_INPUT,0,14));
-		 pane.setEditable(false);
+		pane = new JTextPane();
+		pane.setFont(new Font(Font.DIALOG_INPUT,0,14));
+		pane.setEditable(false);
 		description = result.getFileDetails().getDescription();
-		 container = new JPanel();
-		 locations = new ArrayList<Integer>();
+		container = new JPanel();
+		locations = new ArrayList<Integer>();
 		locations = result.getLocations();
 		createLinkPanel();
-		
-		 
 	}
 	
 	
@@ -139,66 +127,61 @@ public class Link extends JPanel implements MouseListener
 			pane.setText(description);
 		}
 	}
-
-
-
-
-	public String get3Lines() {
+	
+	/**
+	 * A method that gets the first 3 lines of a document to be displayed in the description
+	 * @return - The first 3 lines of a document
+	 */
+	public String get3Lines() 
+	{
 		StringBuilder textData;
 		textData = new StringBuilder();
-
-		try {
-			FileReader fr = new FileReader(path);
-			BufferedReader textReader = new BufferedReader(fr);
-			int numberOfLines = 3;
-			for(int i=0;i<numberOfLines;i++)
-			{
-				String line = textReader.readLine();
-				if(line!=null)
+		if(fileDetails.getExtension().equals(".txt"))
+		{
+						try {
+				FileReader fr = new FileReader(path);
+				BufferedReader textReader = new BufferedReader(fr);
+				int numberOfLines = 3;
+				for(int i=0;i<numberOfLines;i++)
 				{
-					textData.append(line);
-				textData.append('\n');
+					String line = textReader.readLine();
+					if(line!=null)
+					{
+						textData.append(line);
+						textData.append('\n');
+					}
+				}
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
-			}
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		}
+		else if(fileDetails.getExtension().equals(".pdf"))
+		{
+			String text = PDFHandler.getText(getPath());
+			textData.append(text.substring(0, 100));
 		}
 		return textData.toString();
 	}
-
-
-
-
+	
+	/**
+	 * A getter for the file path
+	 * @return The file path
+	 */
 	public String getPath() {
 		return path;
 	}
-
-
-
-
-	public void setPath(String path) {
-		this.path = path;
-	}
-
-
-
-
 	
+	/**
+	 * Gets the file details of the file
+	 * @return The file details of the file
+	 */
 	public FileDetails getFileDetails() {
 		return fileDetails;
 	}
-
-
-
-	public void setFileDetails(FileDetails fileDetails) {
-		this.fileDetails = fileDetails;
-	}
-
-
 
 	@Override
 	public void mouseClicked(MouseEvent e) 
@@ -216,6 +199,9 @@ public class Link extends JPanel implements MouseListener
 		// TODO Auto-generated method stub
 		
 	}
+	/**
+	 * When the link is pressed - a new frame is initiated according to the type of link
+	 */
 	@Override
 	public void mousePressed(MouseEvent e) {
 		if(type == ResultType.DOCUMENT)
@@ -228,9 +214,17 @@ public class Link extends JPanel implements MouseListener
 			}
 			else if(fileDetails.getExtension().equals(".pdf"))
 			{
+				try {
+					PDFReader p = new PDFReader(getPath());
+					p.setVisible(true);
+				} catch (Exception e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				/*
 				PDFDocumentDisplay display = new PDFDocumentDisplay(getFileDetails(),getLocations());
 				display.setTitle(documentName.getText());
-				display.createDisplay();
+				display.createDisplay();*/
 			}
 			
 		}

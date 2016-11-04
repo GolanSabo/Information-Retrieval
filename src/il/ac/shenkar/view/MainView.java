@@ -44,12 +44,14 @@ public class MainView extends JFrame implements ActionListener
 	private JPanel bottomPanel;
 	private JTextField changePage;
 	private JLabel numberOfPages;
-	
 	private JPanel queryPanel;
+	private JLabel searchTime;
 	
 	public MainView()
 	{
 		Controller.getInstance().init();
+		Controller.getInstance().setView(this);
+		searchTime = new JLabel("");
 		input = new JTextField(20);
 		input.addActionListener(this);
 		search = new JButton();
@@ -127,6 +129,8 @@ public void addComponentToPane(Container pane) {
         card1.setLayout(new BorderLayout());
         queryPanel.add(input);
         queryPanel.add(search);
+        //searchTime.setVisible(false);
+        queryPanel.add(searchTime);
         
        
         body.setLayout(new BoxLayout(body, BoxLayout.Y_AXIS));
@@ -161,12 +165,15 @@ public void addComponentToPane(Container pane) {
 	@Override
 	public void actionPerformed(ActionEvent event) 
 	{
+		
 		if( event.getSource()==search || event.getSource()==input)
 		{
+			body.removeAll();
+			this.repaint();
 			try {
 				bottomPanel.setVisible(true);
 				page=1;
-				links = Controller.getInstance().getResults(input.getText());
+				links = Controller.getInstance().getSearchResults(input.getText());
 				numberOfResults = links.size();
 				if(numberOfResults%4==0)
 					pages = numberOfResults/4; 
@@ -176,7 +183,7 @@ public void addComponentToPane(Container pane) {
 				addLinksToPanel();
 			} catch (NoResultsException e) {
 				bottomPanel.setVisible(false);
-				JOptionPane.showMessageDialog(this,"Search returned no results\n"
+				JOptionPane.showMessageDialog(this,e.getMessage()
 						, "No results",JOptionPane.ERROR_MESSAGE);
 			}
 			
@@ -195,7 +202,18 @@ public void addComponentToPane(Container pane) {
 		
 	}
 
+	public void setSearchTime(long milliseconds, int linkCount)
+	{
+		double time = milliseconds/1000.0; 
+		searchTime.setText("Found " + linkCount + " Results " + " in " 
+		+ String.valueOf(time) + " seconds");
+		searchTime.setVisible(true);
+	}
 
+
+	/*
+	 * Adds up to 4 links to the main view according to the current page
+	 */
 	private void addLinksToPanel() 
 	{
 		body.removeAll();

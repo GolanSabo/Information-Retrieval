@@ -4,7 +4,7 @@ import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 
 import il.ac.shenkar.Details.FileDetails;
-import il.ac.shenkar.pdf.utils.PDFReader;
+import il.ac.shenkar.pdf.utils.PDFHandler;
 
 public class PDFDocumentDisplay extends TextDocumentDisplay
 {
@@ -17,7 +17,7 @@ public class PDFDocumentDisplay extends TextDocumentDisplay
 	@Override
 	public String getText() 
 	{
-		String text = PDFReader.getText(getPath());
+		String text = PDFHandler.getText(getPath());
 		return text;
 	}
 

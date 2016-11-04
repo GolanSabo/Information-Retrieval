@@ -315,6 +315,12 @@ public class SettingsContainer  extends JPanel implements ActionListener, MouseL
 				Controller.getInstance().storeInDatabase(path.getText(),name.getText(),author.getText(),
 						subject.getText(),description.getText(),date.getText());
 				documents.addItem((String)name.getText());
+				path.setText("");
+				name.setText("");
+				author.setText("");
+				subject.setText("");
+				description.setText("");
+				date.setText("");
 			} catch (IOException e1) {
 				JOptionPane.showMessageDialog(this,"Could not store file in database!\n"
 						, "IO Error",JOptionPane.ERROR_MESSAGE);

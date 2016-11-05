@@ -75,6 +75,8 @@ public class Searcher {
 				if(i == 0 && words.length == 1)
 					throw new Exception("invalid logical sentence");
 				++i;
+				if(i > words.length -1)
+					throw new Exception("invalid logical sentence");
 				break;
 			case "or":
 				action = 1;
@@ -85,7 +87,8 @@ public class Searcher {
 				if(i == 0)
 					throw new Exception("invalid logical sentence");
 				++i;
-
+				if(i > words.length -1)
+					throw new Exception("invalid logical sentence");
 				int x = checkNextWord(words[i]);
 				if(x > 0){
 					while((x = checkNextWord(words[i])) > 0){
@@ -116,6 +119,8 @@ public class Searcher {
 				notFlag = false;
 			}
 
+			if(tmp == null)
+				continue;
 			if(action == 1 || action == -1)
 				list.addAll(logicalOr(tmp,list));
 			else if(action == 0)
@@ -267,13 +272,10 @@ public class Searcher {
 	//	}
 
 	private static ArrayList<Node> logicalOr(ArrayList<Node> list, ArrayList<Node> tmp) throws Exception{
-		try{
+
 		if(tmp!=null)
 			list.addAll(tmp);
-		}
-		catch(Exception e){
-			throw new Exception("Empty query");
-		}
+
 		return list;
 	}
 

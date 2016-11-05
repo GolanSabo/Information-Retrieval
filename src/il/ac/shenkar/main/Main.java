@@ -12,7 +12,6 @@ public class Main {
 	public static void main(String[] args) 
 	{
 		final MainView view = new MainView();
-		System.out.println(Soundex.soundex("meat") + "\n" +Soundex.soundex("meet") + "\n"+Soundex.soundex("meed") + "\n");
 		
 		SwingUtilities.invokeLater(new Runnable() 
 		{

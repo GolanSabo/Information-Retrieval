@@ -59,8 +59,10 @@ public class FileParser {
 			parse(fileDetails.getDocumentName(), fileDetails, -2);
 			parse(fileDetails.getDescription(), fileDetails, -3);
 			parse(fileDetails.getAuthor(), fileDetails, -4);
+			
 			DateFormat sdf = new SimpleDateFormat("dd/mm/yy");
 			parse(sdf.format(fileDetails.getDate()), fileDetails, -5);
+			parse(fileDetails.getSubject(), fileDetails, -6);
 			
 			switch (fileDetails.getExtension())
 			{

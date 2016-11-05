@@ -11,6 +11,7 @@ import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
+import javax.swing.JTextPane;
 import javax.swing.border.EmptyBorder;
 
 import javafx.scene.layout.Border;
@@ -18,7 +19,7 @@ import javafx.scene.layout.Border;
 /**
  * A class that represents image panel - to be used in image display
  */
-public class ImagePanel extends JPanel{
+public class ImagePanel extends JTextPane{
 
 	//The image
     private BufferedImage image;
@@ -27,6 +28,8 @@ public class ImagePanel extends JPanel{
        try {                
           image = ImageIO.read(new File(path));
           this.setBorder(BorderFactory.createLineBorder(Color.black));
+          this.setBackground(Color.LIGHT_GRAY);
+          this.setEditable(false);
           this.setMaximumSize(getPanelSize());
        } catch (IOException ex) {
             
@@ -36,7 +39,10 @@ public class ImagePanel extends JPanel{
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        g.drawImage(image, 0, 0, this);            
+        int x = (this.getWidth()-image.getWidth())/2;
+        int y = (this.getHeight()-image.getHeight())/2;
+
+        g.drawImage(image, x, y, this);            
     }
 
     public Dimension getPanelSize()

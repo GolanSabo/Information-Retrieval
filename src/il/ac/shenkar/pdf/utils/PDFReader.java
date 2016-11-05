@@ -1,6 +1,7 @@
 package il.ac.shenkar.pdf.utils;
 
 import java.awt.BorderLayout;
+
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -8,12 +9,14 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.print.PrinterException;
+import java.awt.print.PrinterJob;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -21,33 +24,10 @@ import javax.swing.JScrollPane;
 import org.apache.pdfbox.debugger.ui.ReaderBottomPanel;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.printing.PDFPageable;
 import org.apache.pdfbox.debugger.pagepane.PagePane;
 
-/*
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 
-
-/**
- * An application to read PDF documents.  This will provide Acrobat Reader like
- * funtionality.
- *
- * @author <a href="ben@benlitchfield.com">Ben Litchfield</a>
- * @version $Revision: 1.5 $
- */
 
 public class PDFReader extends JFrame implements KeyListener
 {
@@ -62,7 +42,6 @@ public class PDFReader extends JFrame implements KeyListener
     private int currentPage = 0;
     private int numberOfPages = 0;
     private String currentFilename = null;
-    
     /**
      * Constructor.
      * @throws Exception 
@@ -100,8 +79,7 @@ public class PDFReader extends JFrame implements KeyListener
         getContentPane().add( documentScroller, BorderLayout.CENTER );
         getContentPane().add( bottomStatusPanel, BorderLayout.SOUTH );
 
-
-      
+        new JButton("Print");
 
 
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -190,7 +168,9 @@ public class PDFReader extends JFrame implements KeyListener
     	{
     		documentPanel.remove(0);
     	}
+    	
     	documentPanel.add( pane.getPanel() );
+    	
     	pack();
 
     	
@@ -224,11 +204,23 @@ public class PDFReader extends JFrame implements KeyListener
 
 	@Override
 	public void keyPressed(KeyEvent key) {
-		System.out.println("a");
 		if (key.getKeyChar()== '+')
 			nextPage();
 		else if(key.getKeyChar()== '-')
 			previousPage();
+		else if ((key.getKeyCode() == KeyEvent.VK_P) && ((key.getModifiers() & KeyEvent.CTRL_MASK) != 0))
+		{
+			PrinterJob job = PrinterJob.getPrinterJob();
+			job.setPageable(new PDFPageable(document));
+			if (job.printDialog()) {
+			    try {
+					job.print();
+				} catch (PrinterException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
 	}
 
 	@Override

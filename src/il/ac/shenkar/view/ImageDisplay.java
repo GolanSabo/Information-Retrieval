@@ -9,6 +9,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.print.PrinterException;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -47,7 +48,7 @@ public class ImageDisplay extends JFrame implements ActionListener, ILinkDisplay
 	private String title;
 	private JPanel optionsPanel;
 	private JScrollPane scrollpane;
-
+	
 	
 	public ImageDisplay(FileDetails fd)
 	{
@@ -125,34 +126,12 @@ public class ImageDisplay extends JFrame implements ActionListener, ILinkDisplay
 		}
 		else if(event.getSource()==print)
 		{
-			// Input the file
-			FileInputStream textStream = null; 
-			try { 
-			        textStream = new FileInputStream(path); 
-			} catch (FileNotFoundException ffne) { 
-			} 
-			if (textStream == null) { 
-			        return; 
-			} 
-			// Set the document type
-			DocFlavor myFormat = DocFlavor.INPUT_STREAM.AUTOSENSE;
-			// Create a Doc
-			Doc myDoc = new SimpleDoc(textStream, myFormat, null); 
-			// Build a set of attributes
-			PrintRequestAttributeSet aset = new HashPrintRequestAttributeSet(); 
-			aset.add(new Copies(1)); 
-			aset.add(MediaSizeName.ISO_A4);
-			// discover the printers that can print the format according to the
-			// instructions in the attribute set
-			PrintService[] services =
-			        PrintServiceLookup.lookupPrintServices(myFormat, aset);
-			// Create a print job from one of the print services
-			if (services.length > 0) { 
-			        DocPrintJob job = services[0].createPrintJob(); 
-			        try { 
-			                job.print(myDoc, aset); 
-			        } catch (PrintException pe) {} 
-			} 
+			try {
+				image.print();
+			} catch (PrinterException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	}
 	

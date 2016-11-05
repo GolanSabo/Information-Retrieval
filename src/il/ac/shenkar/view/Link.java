@@ -50,7 +50,12 @@ public class Link extends JPanel implements MouseListener
 		fileDetails = result.getFileDetails();
 		type = _type;
 		path=result.getFileDetails().getPath();
-		documentName = new JLabel(result.getFileDetails().getDocumentName());
+		locations = new ArrayList<Integer>();
+		locations = result.getLocations();
+		int matchings = getMatchings(locations);
+		
+		documentName = new JLabel(result.getFileDetails().getDocumentName() + 
+				" - " + matchings +" matches");
 		documentName.setForeground(Color.blue);
 		documentName.setAlignmentX(JLabel.LEFT);
 		documentName.setFont(new Font(Font.SERIF,3,14));
@@ -59,14 +64,26 @@ public class Link extends JPanel implements MouseListener
 		pane.setEditable(false);
 		description = result.getFileDetails().getDescription();
 		container = new JPanel();
-		locations = new ArrayList<Integer>();
-		locations = result.getLocations();
+		
 		keywords = new ArrayList<String>();
 		keywords = result.getWords();
 		createLinkPanel();
 	}
 	
 	
+
+	private int getMatchings(ArrayList<Integer> locations) 
+	{
+		int counter = 0;
+		for (int tmp: locations)
+		{
+			if(tmp!=-1)
+				counter++;
+		}
+		return counter;
+	}
+
+
 
 	public ArrayList<Integer> getLocations() {
 		return locations;

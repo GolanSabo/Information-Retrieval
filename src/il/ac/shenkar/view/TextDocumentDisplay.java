@@ -13,6 +13,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.print.PageFormat;
+import java.awt.print.Pageable;
 import java.awt.print.Printable;
 import java.awt.print.PrinterException;
 import java.awt.print.PrinterJob;
@@ -26,7 +27,10 @@ import java.util.Arrays;
 
 import javax.swing.text.*;
 
+import org.apache.pdfbox.printing.PDFPageable;
+
 import il.ac.shenkar.Details.FileDetails;
+import sun.print.PageableDoc;
 
 import javax.print.Doc;
 import javax.print.DocFlavor;
@@ -184,51 +188,13 @@ public class TextDocumentDisplay extends JFrame implements ActionListener, Mouse
 		else if(event.getSource()==print)
 		{
 			
-			// Input the file
-			FileInputStream textStream = null; 
-			try { 
-			        textStream = new FileInputStream(path); 
-			} catch (FileNotFoundException e) 
-			{ 
-				e.printStackTrace();
-			} 
-			if (textStream == null) { 
-			        return; 
-			} 
-			// Set the document type
-			DocFlavor myFormat = DocFlavor.INPUT_STREAM.AUTOSENSE;
-			// Create a Doc
-			Doc myDoc = new SimpleDoc(textStream, myFormat, null); 
-			// Build a set of attributes
-			PrintRequestAttributeSet aset = new HashPrintRequestAttributeSet(); 
-			aset.add(new Copies(1)); 
-			aset.add(MediaSizeName.ISO_A4);
-			// discover the printers that can print the format according to the
-			// instructions in the attribute set
-			/*PrintService[] services =
-			        PrintServiceLookup.lookupPrintServices(myFormat, aset);
-			// Create a print job from one of the print services
-			if (services.length > 0) { 
-			        DocPrintJob job = services[0].createPrintJob(); 
-			        try { 
-			                job.print(myDoc, aset); 
-			        } catch (PrintException pe) {} 
-			}*/
-			
-			PrinterJob pj = PrinterJob.getPrinterJob();
-			    if (pj.printDialog()) {
-			        try
-			        {
-			        	//pj.setPrintService(service);
-			        	DocPrintJob doc = pj.getPrintService().createPrintJob();
-			        	doc.print(myDoc, aset);
-			        	
-			        }
-			        catch (PrintException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-			     }  
+		
+			    try {
+					tPane.print();
+				} catch (PrinterException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 		}
 		
 		

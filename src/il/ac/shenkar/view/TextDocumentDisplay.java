@@ -44,18 +44,12 @@ public class TextDocumentDisplay extends JFrame implements ActionListener, Mouse
 	,ILinkDisplay, ITextDocument
 {
 	
-	private int currentPage = 1;
 	private JTextPane tPane;
-	private JPanel documentPanel;
-	private JTextPane detailsPane;
+	private JPanel emptyPanelRight;
+	private JPanel emptyPanelBottom;
+	private JPanel emptyPanelTop;
 	private String text;
 	private ArrayList<Integer> locations;
-	//private ArrayList<Page> pages;
-	//private JButton back;
-	//private JButton next;
-	//private JPanel bottomPanel;
-	//private JTextField changePage;
-	//private JLabel numberOfPages;
 	private JScrollPane scrollpane;
 	private String path;
 	private String author;
@@ -63,7 +57,7 @@ public class TextDocumentDisplay extends JFrame implements ActionListener, Mouse
 	private String description;
 	private String date;
 	private String title;
-	private JPanel detailsPanel;
+	private JPanel optionsPanel;
 	private JButton showDetails;
 	private JButton print;
 	public TextDocumentDisplay(FileDetails fd, ArrayList<Integer> _locations)
@@ -74,45 +68,26 @@ public class TextDocumentDisplay extends JFrame implements ActionListener, Mouse
 		author = fd.getAuthor();
 		subject = fd.getSubject();
 		description = fd.getDescription();
-		
 		date = fd.getDate().toString();
-		documentPanel = new JPanel();
+		emptyPanelRight = new JPanel();
+		emptyPanelBottom = new JPanel();
+		emptyPanelTop = new JPanel();
 		tPane = new JTextPane();
-		//back = new JButton();
-		//next = new JButton();
-		
 		text = getText();
-		
-		
-	/*	pages = new ArrayList<Page>();
-		bottomPanel = new JPanel();
-		back.addActionListener(this);
-		back.setSize(50, 50);
-		back.setIcon(new ImageIcon("Back.png"));
-		next.setIcon(new ImageIcon("Next.png"));
-		next.addActionListener(this);
-		changePage = new JTextField(2);
-		changePage.addActionListener(this);
-		numberOfPages = new JLabel("");
-		*/scrollpane = new JScrollPane(tPane);
-		detailsPanel = new JPanel();
-		detailsPane = new JTextPane();
-		
+		scrollpane = new JScrollPane(tPane);
+		optionsPanel = new JPanel();
 		setTextPaneContent();
-		
-		setDetailsPanel();
-		detailsPane.setEditable(false);
 		showDetails = new JButton("Details");
+		showDetails.setToolTipText("Shows the details of this document");
 		showDetails.addActionListener(this);
 		print = new JButton("Print");
+		print.setToolTipText("Prints the document");
 		print.addActionListener(this);
-		//scrollpane = new JScrollPane(tPane);
-		this.addMouseListener(this);
-		//getPages();
-		
+		this.addMouseListener(this);	
 	}
 	
-	private void setDetailsPanel() 
+	
+	private String getDetails() 
 	{
 		StringBuilder sb = new StringBuilder();
 		sb.append("Title: " + title + "\n" 
@@ -120,7 +95,7 @@ public class TextDocumentDisplay extends JFrame implements ActionListener, Mouse
 				+ "Subject: " + subject + "\n"
 				+ "Description: " + description + "\n"
 				+ "Published: " + date + "\n");
-		detailsPane.setText(sb.toString());
+		return sb.toString();
 	}
 	
 	private void setTextPaneContent()
@@ -141,84 +116,37 @@ public class TextDocumentDisplay extends JFrame implements ActionListener, Mouse
 			wordCounter++;
 
 		}
-		//appendToPane(tPane,"\n", Color.black);
 
 		
 	}
 
 	public void createDisplay()
 	{
-		
-		this.setPreferredSize(new Dimension(500,380));
-		
+		this.setPreferredSize(new Dimension(800,400));
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		//bottomPanel.setLayout(new FlowLayout());
-		int charCounter = 0;
-				
-		//tPane.setEditable(false);
 		tPane.setMaximumSize(new Dimension(350,380));
 		scrollpane = new JScrollPane(tPane);
-	//	scrollpane.setMaximumSize(new Dimension(350,380));
 		add(scrollpane,BorderLayout.CENTER);
-		//add(documentPanel,BorderLayout.CENTER);
-		
-		/*bottomPanel.add(back);
-		if(currentPage<=1)
-			bottomPanel.remove(back);
-		
-		this.repaint();
-		changePage.setText(""+currentPage);
-		bottomPanel.add(changePage);
-		bottomPanel.add(numberOfPages);
-		if(currentPage==pages.size())
-			next.setEnabled(false);
-		else
-			next.setEnabled(true);
-		bottomPanel.add(next);
-		add(bottomPanel,BorderLayout.SOUTH);
-		*/
-		detailsPanel.setLayout(new GridBagLayout()); 
+		emptyPanelRight.setPreferredSize(new Dimension(100,100));
+		emptyPanelTop.setPreferredSize(new Dimension(100,20));
+		emptyPanelBottom.setPreferredSize(new Dimension(100,20));
+		add(emptyPanelRight, BorderLayout.EAST);
+		add(emptyPanelTop, BorderLayout.NORTH);
+		add(emptyPanelBottom, BorderLayout.SOUTH);
+		optionsPanel.setLayout(new GridBagLayout()); 
 		GridBagConstraints c = new GridBagConstraints();
 		c.gridx = 0;
 		c.gridy = 0;
 		c.insets = new Insets(10,10,10,10);
-		detailsPanel.add(showDetails,c);
+		optionsPanel.add(showDetails,c);
 		c.gridx = 0;
 		c.gridy = 2;
-		detailsPanel.add(print,c);
-		add(detailsPanel,BorderLayout.WEST);
+		optionsPanel.add(print,c);
+		add(optionsPanel,BorderLayout.WEST);
 		setVisible(true);
 		pack();
 	}
-	/*
-	private void getPages()
-	{
-		pages.removeAll(pages);
-		Page temp = new Page();
-		int counter = 0;
-		for(String line : text)
-		{
-			String [] words = line.split(" ");
-			for(String word:words)
-			{
-				if(counter%400==0 && counter!=0)
-				{
-					pages.add(temp);
-					temp= new Page();
-					temp.addToData(word);
-				}
-				else
-				{
-					temp.addToData(word);
-				}
-				counter++;
-			}
-		}
-		pages.add(temp);
-		numberOfPages.setText("/"+pages.size());
-
-		
-	}*/
+	
 	private void appendToPane(JTextPane tp, String msg, Color c)
     {
         StyleContext sc = StyleContext.getDefaultStyleContext();
@@ -236,25 +164,10 @@ public class TextDocumentDisplay extends JFrame implements ActionListener, Mouse
 	@Override
 	public void actionPerformed(ActionEvent event) 
 	{
-		/*
-		if(event.getSource()==back)
-		{
-			currentPage--;
-			createDisplay();
-		}
-		else if(event.getSource()==next)
-		{
-			currentPage++;
-			createDisplay();
-		}
-		else if(event.getSource()==changePage)
-		{
-			currentPage = Integer.parseInt(changePage.getText());
-			createDisplay();
-		}*/
+		
 		if(event.getSource()==showDetails)
 		{
-			JOptionPane.showMessageDialog(this,detailsPane.getText()
+			JOptionPane.showMessageDialog(this,getDetails()
 					, "File Details",JOptionPane.INFORMATION_MESSAGE);
 		}
 		else if(event.getSource()==print)
@@ -293,8 +206,9 @@ public class TextDocumentDisplay extends JFrame implements ActionListener, Mouse
 		
 	}
 	
-	
-	
+	/**
+	 * Gets the text from the txt file
+	 */
 	public String getText() 
 	{
 		StringBuilder textData =null;
@@ -311,6 +225,7 @@ public class TextDocumentDisplay extends JFrame implements ActionListener, Mouse
 				textData.append(textReader.readLine());
 				textData.append("\n");
 			}
+			textReader.close();
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -356,33 +271,30 @@ public class TextDocumentDisplay extends JFrame implements ActionListener, Mouse
 	public void mousePressed(MouseEvent e) {
 		if(e.getButton()==MouseEvent.BUTTON3)
 		{
-			JOptionPane.showMessageDialog(this,detailsPane.getText()
+			JOptionPane.showMessageDialog(this,getDetails()
 					, "File Details",JOptionPane.INFORMATION_MESSAGE);
 		}
 	}
 
 	@Override
 	public void mouseClicked(MouseEvent arg0) {
-		// TODO Auto-generated method stub
+		// Do nothing
 		
 	}
 
 	@Override
 	public void mouseEntered(MouseEvent arg0) {
-		// TODO Auto-generated method stub
-		
+		// Do nothing		
 	}
 
 	@Override
 	public void mouseExited(MouseEvent arg0) {
-		// TODO Auto-generated method stub
-		
+		// Do nothing		
 	}
 
 	@Override
 	public void mouseReleased(MouseEvent arg0) {
-		// TODO Auto-generated method stub
-		
+		// Do nothing		
 	}
 
 	

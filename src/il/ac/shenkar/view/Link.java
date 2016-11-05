@@ -43,8 +43,9 @@ public class Link extends JPanel implements MouseListener
 	 * A constructor for the link 
 	 * @param result - the result sent from the searcher via the controller
 	 * @param _type - the type of document
+	 * @throws Exception 
 	 */
-	public Link(SearchResult result, ResultType _type)
+	public Link(SearchResult result, ResultType _type) throws Exception
 	{
 		fileDetails = result.getFileDetails();
 		type = _type;
@@ -86,7 +87,7 @@ public class Link extends JPanel implements MouseListener
 	}
 
 	
-	public void createLinkPanel()
+	public void createLinkPanel() throws Exception
 	{
 		setSize(200, 50);
 		setLayout(new BorderLayout());
@@ -107,7 +108,7 @@ public class Link extends JPanel implements MouseListener
 		add(container,BorderLayout.WEST);
 		setVisible(true);
 	}
-	private void setDescription() {
+	private void setDescription() throws Exception {
 		if(type==ResultType.DOCUMENT)
 		{
 			if(description.equals(""))
@@ -131,14 +132,15 @@ public class Link extends JPanel implements MouseListener
 	/**
 	 * A method that gets the first 3 lines of a document to be displayed in the description
 	 * @return - The first 3 lines of a document
+	 * @throws Exception 
 	 */
-	public String get3Lines() 
+	public String get3Lines() throws Exception 
 	{
 		StringBuilder textData;
 		textData = new StringBuilder();
 		if(fileDetails.getExtension().equals(".txt"))
 		{
-						try {
+			try {
 				FileReader fr = new FileReader(path);
 				BufferedReader textReader = new BufferedReader(fr);
 				int numberOfLines = 3;
@@ -151,12 +153,12 @@ public class Link extends JPanel implements MouseListener
 						textData.append('\n');
 					}
 				}
+				textReader.close();
 			} catch (FileNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				throw new Exception("File not Found");
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				throw new Exception("Could not read first 3 lines");
+				
 			}
 		}
 		else if(fileDetails.getExtension().equals(".pdf"))
@@ -186,7 +188,7 @@ public class Link extends JPanel implements MouseListener
 	@Override
 	public void mouseClicked(MouseEvent e) 
 	{
-		
+		// Do nothing
 		
 	}
 	@Override
@@ -196,7 +198,7 @@ public class Link extends JPanel implements MouseListener
 	}
 	@Override
 	public void mouseExited(MouseEvent e) {
-		// TODO Auto-generated method stub
+		// Do nothing
 		
 	}
 	/**
@@ -218,19 +220,14 @@ public class Link extends JPanel implements MouseListener
 					PDFReader p = new PDFReader(getPath());
 					p.setVisible(true);
 				} catch (Exception e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
+					e1.getMessage();
 				}
-				/*
-				PDFDocumentDisplay display = new PDFDocumentDisplay(getFileDetails(),getLocations());
-				display.setTitle(documentName.getText());
-				display.createDisplay();*/
 			}
 			
 		}
 		else if(type == ResultType.IMAGE)
 		{
-			ImageDisplay display = new ImageDisplay(this);
+			ImageDisplay display = new ImageDisplay(getFileDetails());
 			display.setTitle(documentName.getText());
 			display.createDisplay();
 		}
@@ -239,7 +236,7 @@ public class Link extends JPanel implements MouseListener
 	}
 	@Override
 	public void mouseReleased(MouseEvent e) {
-		// TODO Auto-generated method stub
+		// Do nothing
 		
 	}
 	

@@ -1,5 +1,6 @@
 package il.ac.shenkar.view;
 
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -31,6 +32,11 @@ public class ImagePanel extends JPanel{
         g.drawImage(image, 0, 0, this);            
     }
 
+    public Dimension getPanelSize()
+    {
+        return new Dimension(image.getWidth(),image.getHeight());
+
+    }
 	public BufferedImage getImage() {
 		return image;
 	}

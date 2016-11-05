@@ -5,6 +5,7 @@ import il.ac.shenkar.Utils.FileUtils;
 import il.ac.shenkar.Utils.MapUtils;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
@@ -12,8 +13,10 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.io.Writer;
 /**
  * FileMonitor is responsible of scanning source folder every X sec in order to parse new files into inverted file
  * 
@@ -44,7 +47,7 @@ public class FileMonitor extends Thread{
 					batchTime = Long.parseLong(sCurrentLine);
 				br.close();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
+				
 				e.printStackTrace();
 			}
 		}
@@ -102,15 +105,13 @@ public class FileMonitor extends Thread{
 	public void setBatchTime(long batchTime) {
 		if(batchTime < 0)
 			return;
-		File f = batchFile;
+		BufferedWriter bw = null;
 		try {
-			if(!f.exists())
-				f.createNewFile();
-			DataOutputStream dos = new DataOutputStream(new FileOutputStream(f));
-			dos.writeLong(batchTime);
-			dos.close();
+			bw = new BufferedWriter(new FileWriter(batchFile));
+
+			bw.write(Long.toString(batchTime));
+			bw.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 

@@ -1,6 +1,8 @@
 package il.ac.shenkar.pdf.utils;
 
+import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -12,14 +14,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 
-import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.KeyStroke;
-
-import org.apache.pdfbox.debugger.ui.ExtensionFileFilter;
 import org.apache.pdfbox.debugger.ui.ReaderBottomPanel;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
@@ -54,8 +52,7 @@ import org.apache.pdfbox.debugger.pagepane.PagePane;
 public class PDFReader extends JFrame implements KeyListener
 {
     private File currentDir=new File(".");
-    private javax.swing.JMenuItem contentsMenuItem;
-    private javax.swing.JMenuItem printMenuItem;
+   
     private JPanel documentPanel = new JPanel();
     private ReaderBottomPanel bottomStatusPanel = new ReaderBottomPanel();
 
@@ -86,10 +83,6 @@ public class PDFReader extends JFrame implements KeyListener
     private void initComponents()
     {
     	this.addKeyListener(this);
-        contentsMenuItem = new javax.swing.JMenuItem();
-        
-        printMenuItem = new javax.swing.JMenuItem();
-
         setTitle("PDF Reader");
         addWindowListener(new java.awt.event.WindowAdapter()
         {
@@ -104,41 +97,14 @@ public class PDFReader extends JFrame implements KeyListener
         documentScroller.setViewportView( documentPanel );
 
 
-        getContentPane().add( documentScroller, java.awt.BorderLayout.CENTER );
-        getContentPane().add( bottomStatusPanel, java.awt.BorderLayout.SOUTH );
+        getContentPane().add( documentScroller, BorderLayout.CENTER );
+        getContentPane().add( bottomStatusPanel, BorderLayout.SOUTH );
 
-
-        printMenuItem.setText( "Print" );
-        printMenuItem.addActionListener(new java.awt.event.ActionListener()
-        {
-            public void actionPerformed(java.awt.event.ActionEvent evt)
-            {
-            	/*
-                try
-                {
-                    if (document != null) 
-                    {
-                        document.print();
-                    }
-                }
-                catch( PrinterException e )
-                {
-                    e.printStackTrace();
-                }*/
-            }
-        });
-        
-
-       
-        contentsMenuItem.setText("Contents");
-        //menuBar.add(helpMenu);
-
-       
 
       
 
 
-        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         setBounds((screenSize.width-700)/2, (screenSize.height-600)/2, 700, 600);
     }
 

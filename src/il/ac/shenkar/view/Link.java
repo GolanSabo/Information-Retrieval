@@ -29,8 +29,8 @@ import il.ac.shenkar.pdf.utils.PDFReader;
  */
 public class Link extends JPanel implements MouseListener
 {
-	private String keyword;
 	private ArrayList<Integer> locations;
+	private ArrayList<String> keywords;
 	private FileDetails fileDetails;
 	private String path;
 	private JLabel documentName;
@@ -61,6 +61,8 @@ public class Link extends JPanel implements MouseListener
 		container = new JPanel();
 		locations = new ArrayList<Integer>();
 		locations = result.getLocations();
+		keywords = new ArrayList<String>();
+		keywords = result.getWords();
 		createLinkPanel();
 	}
 	
@@ -76,16 +78,6 @@ public class Link extends JPanel implements MouseListener
 	public String getDocumentName() {
 		return documentName.getText();
 	}
-
-
-	public String getKeyword() {
-		return keyword;
-	}
-
-	public void setKeyword(String keyword) {
-		this.keyword = keyword;
-	}
-
 	
 	public void createLinkPanel() throws Exception
 	{
@@ -210,7 +202,7 @@ public class Link extends JPanel implements MouseListener
 		{
 			if(fileDetails.getExtension().equals(".txt"))
 			{
-				TextDocumentDisplay display = new TextDocumentDisplay(getFileDetails(),getLocations());
+				TextDocumentDisplay display = new TextDocumentDisplay(getFileDetails(),getLocations(),keywords);
 				display.setTitle(documentName.getText());
 				display.createDisplay();
 			}

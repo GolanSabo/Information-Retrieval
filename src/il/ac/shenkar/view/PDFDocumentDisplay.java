@@ -9,8 +9,8 @@ import il.ac.shenkar.pdf.utils.PDFHandler;
 public class PDFDocumentDisplay extends TextDocumentDisplay
 {
 
-	public PDFDocumentDisplay(FileDetails fd, ArrayList<Integer> _locations) {
-		super(fd, _locations);
+	public PDFDocumentDisplay(FileDetails fd, ArrayList<Integer> _locations,ArrayList<String> words) {
+		super(fd, _locations,words);
 		
 	}
 

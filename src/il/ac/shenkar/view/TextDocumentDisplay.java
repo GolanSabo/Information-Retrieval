@@ -22,6 +22,8 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+
 import javax.swing.text.*;
 
 import il.ac.shenkar.Details.FileDetails;
@@ -43,7 +45,8 @@ import javax.swing.*;
 public class TextDocumentDisplay extends JFrame implements ActionListener, MouseListener
 	,ILinkDisplay, ITextDocument
 {
-	
+	private final ArrayList<Color> colors = 
+			new ArrayList<Color>(Arrays.asList(Color.blue,Color.red, Color.green,Color.magenta, Color.orange, Color.pink));
 	private JTextPane tPane;
 	private JPanel emptyPanelRight;
 	private JPanel emptyPanelBottom;
@@ -60,8 +63,10 @@ public class TextDocumentDisplay extends JFrame implements ActionListener, Mouse
 	private JPanel optionsPanel;
 	private JButton showDetails;
 	private JButton print;
-	public TextDocumentDisplay(FileDetails fd, ArrayList<Integer> _locations)
+	private ArrayList<String> keywords;
+	public TextDocumentDisplay(FileDetails fd, ArrayList<Integer> _locations, ArrayList<String> words)
 	{
+		keywords = words;
 		title = fd.getDocumentName();
 		path = fd.getPath();
 		locations = _locations;
@@ -100,20 +105,26 @@ public class TextDocumentDisplay extends JFrame implements ActionListener, Mouse
 	
 	private void setTextPaneContent()
 	{
-		int wordCounter = 0;
-
+		
+		int index=0;
 		String [] words = text.split(" ");
 		for(String word:words)
 		{
-			if(locations.contains(wordCounter))
+			String tmp = word.toLowerCase().replaceAll("[-+.^:;,\'\"\\()?!“”‘’— =<>\0&%$#*!?@|]*","");
+			
+			if(keywords.contains((String)tmp))
 			{
-				appendToPane(tPane, word+ " ", Color.red);
+				
+				index = keywords.indexOf(tmp);
+				if(index>=colors.size())
+					index = index%colors.size();
+				appendToPane(tPane, word+ " ", colors.get(index));
 			}
 			else
 			{
 				appendToPane(tPane, word+ " ", Color.black);
 			}
-			wordCounter++;
+			
 
 		}
 
@@ -172,7 +183,7 @@ public class TextDocumentDisplay extends JFrame implements ActionListener, Mouse
 		}
 		else if(event.getSource()==print)
 		{
-			/*
+			
 			// Input the file
 			FileInputStream textStream = null; 
 			try { 
@@ -194,7 +205,7 @@ public class TextDocumentDisplay extends JFrame implements ActionListener, Mouse
 			aset.add(MediaSizeName.ISO_A4);
 			// discover the printers that can print the format according to the
 			// instructions in the attribute set
-			PrintService[] services =
+			/*PrintService[] services =
 			        PrintServiceLookup.lookupPrintServices(myFormat, aset);
 			// Create a print job from one of the print services
 			if (services.length > 0) { 
@@ -203,12 +214,20 @@ public class TextDocumentDisplay extends JFrame implements ActionListener, Mouse
 			                job.print(myDoc, aset); 
 			        } catch (PrintException pe) {} 
 			}*/
+			
 			PrinterJob pj = PrinterJob.getPrinterJob();
 			    if (pj.printDialog()) {
-			        try {pj.print();}
-			        catch (PrinterException exc) {
-			            System.out.println(exc);
-			         }
+			        try
+			        {
+			        	//pj.setPrintService(service);
+			        	DocPrintJob doc = pj.getPrintService().createPrintJob();
+			        	doc.print(myDoc, aset);
+			        	
+			        }
+			        catch (PrintException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 			     }  
 		}
 		

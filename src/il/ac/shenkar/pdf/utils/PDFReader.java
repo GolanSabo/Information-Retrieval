@@ -170,6 +170,10 @@ public class PDFReader extends JFrame implements KeyListener
     	}
     	
     	documentPanel.add( pane.getPanel() );
+    	documentPanel.setToolTipText("Press ctrl + 'p' to print document"
+    			+ " '+' to go to next page"
+    			+ " '-' to go back one page");
+    	
     	
     	pack();
 

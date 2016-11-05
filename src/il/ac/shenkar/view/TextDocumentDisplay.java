@@ -172,11 +172,14 @@ public class TextDocumentDisplay extends JFrame implements ActionListener, Mouse
 		}
 		else if(event.getSource()==print)
 		{
+			/*
 			// Input the file
 			FileInputStream textStream = null; 
 			try { 
 			        textStream = new FileInputStream(path); 
-			} catch (FileNotFoundException ffne) { 
+			} catch (FileNotFoundException e) 
+			{ 
+				e.printStackTrace();
 			} 
 			if (textStream == null) { 
 			        return; 
@@ -199,7 +202,14 @@ public class TextDocumentDisplay extends JFrame implements ActionListener, Mouse
 			        try { 
 			                job.print(myDoc, aset); 
 			        } catch (PrintException pe) {} 
-			} 
+			}*/
+			PrinterJob pj = PrinterJob.getPrinterJob();
+			    if (pj.printDialog()) {
+			        try {pj.print();}
+			        catch (PrinterException exc) {
+			            System.out.println(exc);
+			         }
+			     }  
 		}
 		
 		

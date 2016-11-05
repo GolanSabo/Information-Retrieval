@@ -12,17 +12,32 @@ public class Node implements Serializable{
 	private static final long serialVersionUID = 1L;
 	private FileDetails fileDetails;
 	private int numOfTimes;
+	private String word;
 	private ArrayList<Integer> locations;
 	
 	/**
 	 * constructor
 	 * @param fileDetails - details about the 
 	 */
+	public Node(FileDetails fileDetails,String word){
+		this.fileDetails = fileDetails;
+		this.word = word;
+		locations = new ArrayList<Integer>();
+	}
+	
 	public Node(FileDetails fileDetails){
 		this.fileDetails = fileDetails;
 		locations = new ArrayList<Integer>();
 	}
 	
+	public String getWord() {
+		return word;
+	}
+
+	public void setWord(String word) {
+		this.word = word;
+	}
+
 	public FileDetails getFileDetails(){
 		return fileDetails;
 	}
@@ -46,7 +61,7 @@ public class Node implements Serializable{
 
 	@Override
 	public String toString() {
-		return fileDetails + " Number of appearance = "
+		return  fileDetails + " Number of appearance = "
 				+ numOfTimes + ", In Locations = " + locations + "\n";
 	}
 

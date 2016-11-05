@@ -7,14 +7,16 @@ import java.util.ArrayList;
 public class SearchResult implements Comparable {
 	private FileDetails fileDetails;
 	private ArrayList<Integer> locations;
+	private ArrayList<String> words;
 	private int rank = 0;
 	
 	
 	public SearchResult(FileDetails fileDetails) {
-		if(!fileDetails.getExtension().contains("txt"))
+		if(!fileDetails.getExtension().contains("txt") && !fileDetails.getExtension().contains("pdf"))
 			rank += 5000;
 		this.fileDetails = fileDetails;
 		locations = new ArrayList<>();
+		words = new ArrayList<>();
 	}
 
 	public int getRank() {
@@ -32,7 +34,7 @@ public class SearchResult implements Comparable {
 	public void addLocations(int locations) {
 		if(locations < -1)
 			rank +=1000;
-		else
+		else if(locations > -1)
 			++rank;
 		
 		this.locations.add(locations);
@@ -48,11 +50,19 @@ public class SearchResult implements Comparable {
 
 		return x - rank;
 	}
+	
+	public ArrayList<String> getWords() {
+		return words;
+	}
+	
+	public void setWord(String word){
+		words.add(word);
+	}
 
 	@Override
 	public String toString() {
 		return "SearchResult [rank = " + rank + " fileDetails = " + fileDetails + ", locations = "
-				+ locations + "]\n";
+				+ locations + ", Word = " + words + "]\n";
 	}
 	
 	

@@ -313,6 +313,7 @@ public class Searcher {
 			match = false;
 			for(int j = 0; j < result.size(); ++j){
 				if(tmp.getFileDetails() == result.get(j).getFileDetails()){
+					result.get(j).setWord(tmp.getWord());
 					ArrayList<Integer> l = tmp.getLocations();
 					for(int k = 0; k < l.size(); ++k){
 						int x = l.get(k);
@@ -324,6 +325,7 @@ public class Searcher {
 			if(!match){
 				ArrayList<Integer> l = tmp.getLocations();
 				SearchResult searchResult = new SearchResult(tmp.getFileDetails());
+				searchResult.setWord(tmp.getWord());
 				for(int k = 0; k < l.size(); ++k){
 					int x = l.get(k);
 					searchResult.addLocations(x);

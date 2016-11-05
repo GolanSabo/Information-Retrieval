@@ -1,5 +1,11 @@
 package il.ac.shenkar.FileParser;
 
+import il.ac.shenkar.Details.FileDetails;
+import il.ac.shenkar.Details.Node;
+import il.ac.shenkar.Utils.StopList;
+import il.ac.shenkar.controller.Controller;
+import il.ac.shenkar.pdf.utils.PDFHandler;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -13,13 +19,6 @@ import java.util.HashMap;
 import java.util.Scanner;
 
 import org.apache.commons.io.FileUtils;
-
-import il.ac.shenkar.Details.FileDetails;
-import il.ac.shenkar.Details.Node;
-//import il.ac.shenkar.Utils.FileUtils;
-import il.ac.shenkar.Utils.StopList;
-import il.ac.shenkar.controller.Controller;
-import il.ac.shenkar.pdf.utils.PDFHandler;
 /**
  * 
  * File Parser is responsible of parsing files found while batch job and
@@ -126,7 +125,7 @@ public class FileParser {
 				node = invertedFile.get(word);
 			}
 			else{
-				node = new Node(fileDetails);
+				node = new Node(fileDetails,word);
 			}
 			//save word location in file
 			node.AddLocation(location);

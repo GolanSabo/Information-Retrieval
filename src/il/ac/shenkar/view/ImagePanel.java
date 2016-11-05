@@ -1,5 +1,6 @@
 package il.ac.shenkar.view;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
@@ -8,7 +9,11 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
+import javax.swing.BorderFactory;
 import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
+
+import javafx.scene.layout.Border;
 
 /**
  * A class that represents image panel - to be used in image display
@@ -21,6 +26,8 @@ public class ImagePanel extends JPanel{
     public ImagePanel(String path) {
        try {                
           image = ImageIO.read(new File(path));
+          this.setBorder(BorderFactory.createLineBorder(Color.black));
+          this.setMaximumSize(getPanelSize());
        } catch (IOException ex) {
             
        }

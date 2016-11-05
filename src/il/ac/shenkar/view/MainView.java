@@ -57,6 +57,7 @@ public class MainView extends JFrame implements ActionListener
 		search = new JButton();
 		search.setIcon(new ImageIcon("Search.png"));
 		search.addActionListener(this);
+		search.setToolTipText("Search for " + input.getText());
 		body = new JPanel();
 		back = new JButton();
 		back.setIcon(new ImageIcon("Back.png"));

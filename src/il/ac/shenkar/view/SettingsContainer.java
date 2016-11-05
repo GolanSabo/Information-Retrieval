@@ -78,36 +78,49 @@ public class SettingsContainer  extends JPanel implements ActionListener, MouseL
 
 		lAuthor = new JLabel("Author: ");
 		author = new JTextField(20);
+		author.setToolTipText("type in the author of the document");
 		author.addActionListener(this);
 		lPath = new JLabel("Enter file path: ");
 		path = new JTextField(20);
+		path.setToolTipText("please enter the file path or use the search button");
 		path.addActionListener(this);
 		fc = new JFileChooser("Load");
 		searchFile = new JButton();
 		searchFile.setIcon(new ImageIcon("Search.png"));
 		searchFile.addActionListener(this);
+		searchFile.setToolTipText("Search for file to load");
 		documents = new JComboBox<String>(Controller.getInstance().getDocumentsNames());
 		documents.addActionListener(this);
+		documents.setToolTipText("Files in database");
 		lName = new JLabel("Document name: ");
 		name = new JTextField(20);
+		name.setToolTipText("type in the document name");
 		lSubject = new JLabel("Subject: ");
 		subject = new JTextField(20);
+		subject.setToolTipText("type in the subject of the document");
 		lDescription = new JLabel("Description: ");
 		description = new JTextPane();
+		description.setToolTipText("type in a short description for the document");
 		scroller = new JScrollPane(description);
 		lPublished = new JLabel("Published date (MM/dd/yyyy): ");
 		date = new JTextField(20);
+		date.setToolTipText("type in the date in which the document was published");
 		go = new JButton(new ImageIcon("Upload.png"));
 		go.addActionListener(this);
+		go.setToolTipText("stores the file in database");
 		lChoose = new JLabel("Choose file: ");
 		hidden = new JRadioButton();
 		hidden.setText("Hidden");
+		hidden.setToolTipText("marks the file as hidden");
 		visible = new JRadioButton();
 		visible.setText("Visible");
+		visible.setToolTipText("marks the file as visible");
 		radioList = new ButtonGroup();
 		save = new JButton("save"); 
+		save.setToolTipText("saves the privacy settings");
 		save.addActionListener(this);
 		batchTime = new JComboBox<String>(batch);
+		batchTime.setToolTipText("Set the time for system to check for new files");
 		lBatchTime = new JTextPane();
 		lBatchTime.setText("Please select how often will the system"
 				+ "\n look in database for new uploaded files");
@@ -122,6 +135,7 @@ public class SettingsContainer  extends JPanel implements ActionListener, MouseL
 		explanation.setBackground(Color.lightGray);
 		saveBatch = new JButton("Update");
 		saveBatch.addActionListener(this);
+		saveBatch.setToolTipText("saves the batch time settings");
 		card1 = new JPanel() {
 
 			public Dimension getPreferredSize() {
@@ -130,6 +144,7 @@ public class SettingsContainer  extends JPanel implements ActionListener, MouseL
 				return size;
 			}
 		};
+		card1.setToolTipText("Store a new file in database");
 		card2 = new JPanel() {
 
 			public Dimension getPreferredSize() {
@@ -138,7 +153,7 @@ public class SettingsContainer  extends JPanel implements ActionListener, MouseL
 				return size;
 			}
 		};
-
+		card2.setToolTipText("Set file privacy");
 		container = new JPanel() {
 
 			public Dimension getPreferredSize() {
@@ -157,6 +172,7 @@ public class SettingsContainer  extends JPanel implements ActionListener, MouseL
 				return size;
 			}
 		};
+		card3.setToolTipText("Set batch delay");
 		tabbedPane = new JTabbedPane();
 		currentVisibility = new JLabel();
 		createSettings();

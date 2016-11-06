@@ -103,7 +103,10 @@ public class Searcher {
 
 
 			if(words[i].contains("{") || words[i].contains("[") || words[i].contains("(")){
+				boolean x = notFlag;
+				notFlag = false; 
 				tmp = doParenthensies(query.substring(query.indexOf(words[i])));
+				notFlag = x;
 				i += nextWordIndex;
 				nextWordIndex = 0;
 			}
@@ -290,6 +293,14 @@ public class Searcher {
 			for(int k = 0; k < list.size(); ++k)
 				if(list.get(k).getFileIndex() == count.get(j))
 					list.remove(k);
+		}
+		
+		for(int i = 0; i < tmp.size(); ++i){
+			for(int j = 0; j < list.size(); ++j)
+				if(list.get(j).getFileIndex() == tmp.get(i).getFileIndex()){
+					list.add(tmp.get(i));
+					break;
+				}
 		}
 		return list;
 	}

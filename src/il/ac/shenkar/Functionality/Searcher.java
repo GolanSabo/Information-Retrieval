@@ -117,7 +117,8 @@ public class Searcher {
 				tmp = (ArrayList<Node>) invertedFile.get(words[i]); 
 
 			if(notFlag){
-				tmp = (ArrayList<Node>) invertedFile.get(words[i]); 
+				if(tmp == null)
+					tmp = (ArrayList<Node>) invertedFile.get(words[i]); 
 				tmp = logicalNot(tmp,invertedFile);
 				notFlag = false;
 			}

@@ -53,9 +53,11 @@ public class Link extends JPanel implements MouseListener
 		locations = new ArrayList<Integer>();
 		locations = result.getLocations();
 		int matchings = getMatchings(locations);
-		
-		documentName = new JLabel(result.getFileDetails().getDocumentName() + 
-				" - " + matchings +" matches");
+		if (matchings==0)
+			documentName = new JLabel(result.getFileDetails().getDocumentName());
+		else
+			documentName = new JLabel(result.getFileDetails().getDocumentName() + 
+					" - " + matchings +" matches");
 		documentName.setForeground(Color.blue);
 		documentName.setAlignmentX(JLabel.LEFT);
 		documentName.setFont(new Font(Font.SERIF,3,14));

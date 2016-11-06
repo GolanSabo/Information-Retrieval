@@ -114,7 +114,7 @@ public class TextDocumentDisplay extends JFrame implements ActionListener, Mouse
 		String [] words = text.split(" ");
 		for(String word:words)
 		{
-			String tmp = word.toLowerCase().replaceAll("[-+.^:;,\'\"\\()?!“”‘’— =<>\0&%$#*!?@|]*","");
+			String tmp = word.toLowerCase().replaceAll("[-+.^:;,\'\"\\()?!“”‘’— =<>\0&%$#*!?@|]*\n","");
 			
 			if(keywords.contains((String)tmp))
 			{

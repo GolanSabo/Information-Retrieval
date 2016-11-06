@@ -155,12 +155,12 @@ public class TextDocumentDisplay extends JFrame implements ActionListener, Mouse
 		tPane.setMaximumSize(new Dimension(350,380));
 		scrollpane = new JScrollPane(tPane);
 		add(scrollpane,BorderLayout.CENTER);
-		emptyPanelRight.setPreferredSize(new Dimension(20,100));
-		emptyPanelLeft.setPreferredSize(new Dimension(20,100));
+		emptyPanelRight.setPreferredSize(new Dimension(50,100));
+		emptyPanelLeft.setPreferredSize(new Dimension(50,100));
 		emptyPanelTop.setPreferredSize(new Dimension(100,20));
 		emptyPanelBottom.setPreferredSize(new Dimension(100,20));
 		add(emptyPanelRight, BorderLayout.EAST);
-		add(emptyPanelRight, BorderLayout.WEST);
+		add(emptyPanelLeft, BorderLayout.WEST);
 		add(emptyPanelTop, BorderLayout.NORTH);
 		add(emptyPanelBottom, BorderLayout.SOUTH);
 		

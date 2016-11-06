@@ -275,7 +275,6 @@ public class Searcher {
 	//	}
 
 	private static ArrayList<Node> logicalOr(ArrayList<Node> list, ArrayList<Node> tmp) throws Exception{
-
 		if(tmp!=null)
 			list.addAll(tmp);
 

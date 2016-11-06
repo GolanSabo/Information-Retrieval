@@ -1,7 +1,6 @@
 package il.ac.shenkar.pdf.utils;
 
 import java.awt.BorderLayout;
-
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -16,23 +15,35 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 
-import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.KeyStroke;
+
+import org.apache.pdfbox.debugger.pagepane.PagePane;
 import org.apache.pdfbox.debugger.ui.ReaderBottomPanel;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.printing.PDFPageable;
-import org.apache.pdfbox.debugger.pagepane.PagePane;
+
+import il.ac.shenkar.Details.FileDetails;
 
 
 
-public class PDFReader extends JFrame implements KeyListener
+public class PDFReader extends JFrame implements  ActionListener
 {
     private File currentDir=new File(".");
-   
+    private JMenuBar menuBar;
+    private JMenu menu;
+    private JMenuItem item1;
+    private JMenuItem item2;
+    private JMenuItem item3;
+    private JMenuItem item4;
     private JPanel documentPanel = new JPanel();
     private ReaderBottomPanel bottomStatusPanel = new ReaderBottomPanel();
 
@@ -42,14 +53,18 @@ public class PDFReader extends JFrame implements KeyListener
     private int currentPage = 0;
     private int numberOfPages = 0;
     private String currentFilename = null;
+    private FileDetails details;
+    private ArrayList<Integer> locations;
     /**
      * Constructor.
      * @throws Exception 
      */
-    public PDFReader(String filePath) throws Exception
+    public PDFReader(FileDetails _details, ArrayList<Integer> _locations) throws Exception
     {
         initComponents();
-        openPDFFile(filePath);
+        details = _details;
+        locations = _locations;
+        openPDFFile(details.getPath());
         
     }
 
@@ -61,7 +76,7 @@ public class PDFReader extends JFrame implements KeyListener
      */
     private void initComponents()
     {
-    	this.addKeyListener(this);
+    	
         setTitle("PDF Reader");
         addWindowListener(new java.awt.event.WindowAdapter()
         {
@@ -71,15 +86,36 @@ public class PDFReader extends JFrame implements KeyListener
             }
         });
 
-
+        menuBar = new JMenuBar();
+        menu = new JMenu("Options");
+        item1 = new JMenuItem("Details",KeyEvent.VK_D);
+        KeyStroke ctrlDKeyStroke = KeyStroke.getKeyStroke("control D");
+        item1.setAccelerator(ctrlDKeyStroke);
+        item1.addActionListener(this);
+        item2 = new JMenuItem("Print",KeyEvent.VK_P);
+        KeyStroke ctrlPKeyStroke = KeyStroke.getKeyStroke("control P");
+        item2.setAccelerator(ctrlPKeyStroke);
+        item2.addActionListener(this);
+        item3 = new JMenuItem("Next Page",KeyEvent.VK_N);
+        KeyStroke ctrlNKeyStroke = KeyStroke.getKeyStroke('+');
+        item3.setAccelerator(ctrlNKeyStroke);
+        item3.addActionListener(this);
+        item4 = new JMenuItem("Previous Page",KeyEvent.VK_V);
+        KeyStroke ctrlBKeyStroke = KeyStroke.getKeyStroke('-');
+        item4.setAccelerator(ctrlBKeyStroke);
+        item4.addActionListener(this);
+        menu.add(item3);
+        menu.add(item4);
+        menu.add(item1);
+        menu.add(item2);
+        menuBar.add(menu);
+        setJMenuBar(menuBar);
         JScrollPane documentScroller = new JScrollPane();
         documentScroller.setViewportView( documentPanel );
 
 
         getContentPane().add( documentScroller, BorderLayout.CENTER );
         getContentPane().add( bottomStatusPanel, BorderLayout.SOUTH );
-
-        new JButton("Print");
 
 
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -205,37 +241,48 @@ public class PDFReader extends JFrame implements KeyListener
         return bottomStatusPanel;
     }
 
-
-	@Override
-	public void keyPressed(KeyEvent key) {
-		if (key.getKeyChar()== '+')
-			nextPage();
-		else if(key.getKeyChar()== '-')
-			previousPage();
-		else if ((key.getKeyCode() == KeyEvent.VK_P) && ((key.getModifiers() & KeyEvent.CTRL_MASK) != 0))
-		{
-			PrinterJob job = PrinterJob.getPrinterJob();
-			job.setPageable(new PDFPageable(document));
-			if (job.printDialog()) {
-			    try {
-					job.print();
-				} catch (PrinterException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+	
+	private void printDocument()
+	{
+		PrinterJob job = PrinterJob.getPrinterJob();
+		job.setPageable(new PDFPageable(document));
+		if (job.printDialog()) {
+		    try {
+				job.print();
+			} catch (PrinterException e) {
+				e.printStackTrace();
 			}
 		}
 	}
 
+	
 	@Override
-	public void keyReleased(KeyEvent key) {
-		
+	public void actionPerformed(ActionEvent e) 
+	{
+		if(e.getSource()==item1)
+		{
+			JOptionPane.showMessageDialog(this,getDetails()
+					, "File Details",JOptionPane.INFORMATION_MESSAGE);
+		}
+		else if(e.getSource()==item2)
+		{
+			printDocument();
+		}
+		else if(e.getSource()==item3)
+			nextPage();
+		else if(e.getSource()==item4)
+			previousPage();
 		
 	}
-
-	@Override
-	public void keyTyped(KeyEvent key) {
-		
-		
+	
+	private String getDetails() 
+	{
+		StringBuilder sb = new StringBuilder();
+		sb.append("Title: " + details.getDocumentName() + "\n" 
+				+ "Author: " + details.getAuthor() + "\n"
+				+ "Subject: " + details.getSubject() + "\n"
+				+ "Description: " + details.getDescription() + "\n"
+				+ "Published: " + details.getDate().toString() + "\n");
+		return sb.toString();
 	}
 }

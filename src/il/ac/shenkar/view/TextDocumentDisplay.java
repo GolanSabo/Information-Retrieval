@@ -10,6 +10,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.print.PageFormat;
@@ -55,6 +56,8 @@ public class TextDocumentDisplay extends JFrame implements ActionListener, Mouse
 	private JPanel emptyPanelRight;
 	private JPanel emptyPanelBottom;
 	private JPanel emptyPanelTop;
+	private JPanel emptyPanelLeft;
+
 	private String text;
 	private ArrayList<Integer> locations;
 	private JScrollPane scrollpane;
@@ -64,10 +67,11 @@ public class TextDocumentDisplay extends JFrame implements ActionListener, Mouse
 	private String description;
 	private String date;
 	private String title;
-	private JPanel optionsPanel;
-	private JButton showDetails;
-	private JButton print;
 	private ArrayList<String> keywords;
+	private JMenuBar menuBar;
+	private JMenu menu;
+	private JMenuItem item1;
+	private JMenuItem item2;
 	public TextDocumentDisplay(FileDetails fd, ArrayList<Integer> _locations, ArrayList<String> words)
 	{
 		keywords = words;
@@ -81,18 +85,27 @@ public class TextDocumentDisplay extends JFrame implements ActionListener, Mouse
 		emptyPanelRight = new JPanel();
 		emptyPanelBottom = new JPanel();
 		emptyPanelTop = new JPanel();
+		emptyPanelLeft = new JPanel();
 		tPane = new JTextPane();
 		text = getText();
 		scrollpane = new JScrollPane(tPane);
-		optionsPanel = new JPanel();
 		setTextPaneContent();
-		showDetails = new JButton("Details");
-		showDetails.setToolTipText("Shows the details of this document");
-		showDetails.addActionListener(this);
-		print = new JButton("Print");
-		print.setToolTipText("Prints the document");
-		print.addActionListener(this);
-		this.addMouseListener(this);	
+		this.addMouseListener(this);
+		menuBar = new JMenuBar();
+		menu = new JMenu("Options");
+		item1 = new JMenuItem("Details",KeyEvent.VK_D);
+        KeyStroke ctrlDKeyStroke = KeyStroke.getKeyStroke("control D");
+        item1.setAccelerator(ctrlDKeyStroke);
+        item1.addActionListener(this);
+        item2 = new JMenuItem("Print",KeyEvent.VK_P);
+        KeyStroke ctrlPKeyStroke = KeyStroke.getKeyStroke("control P");
+        item2.setAccelerator(ctrlPKeyStroke);
+        item2.addActionListener(this);
+        menu.add(item1);
+        menu.add(item2);
+        menuBar.add(menu);
+        setJMenuBar(menuBar);
+
 	}
 	
 	
@@ -114,7 +127,7 @@ public class TextDocumentDisplay extends JFrame implements ActionListener, Mouse
 		String [] words = text.split(" ");
 		for(String word:words)
 		{
-			String tmp = word.toLowerCase().replaceAll("[-+.^:;,\'\"\\()?!“”‘’— =<>\0&%$#*!?@|]*","");
+			String tmp = word.toLowerCase().replaceAll("[-+.^:;,\'\"\\()?!“”‘’— =<>\0&%$#*!?@|]*\n","");
 			
 			if(keywords.contains((String)tmp))
 			{
@@ -142,22 +155,15 @@ public class TextDocumentDisplay extends JFrame implements ActionListener, Mouse
 		tPane.setMaximumSize(new Dimension(350,380));
 		scrollpane = new JScrollPane(tPane);
 		add(scrollpane,BorderLayout.CENTER);
-		emptyPanelRight.setPreferredSize(new Dimension(100,100));
+		emptyPanelRight.setPreferredSize(new Dimension(50,100));
+		emptyPanelLeft.setPreferredSize(new Dimension(50,100));
 		emptyPanelTop.setPreferredSize(new Dimension(100,20));
 		emptyPanelBottom.setPreferredSize(new Dimension(100,20));
 		add(emptyPanelRight, BorderLayout.EAST);
+		add(emptyPanelLeft, BorderLayout.WEST);
 		add(emptyPanelTop, BorderLayout.NORTH);
 		add(emptyPanelBottom, BorderLayout.SOUTH);
-		optionsPanel.setLayout(new GridBagLayout()); 
-		GridBagConstraints c = new GridBagConstraints();
-		c.gridx = 0;
-		c.gridy = 0;
-		c.insets = new Insets(10,10,10,10);
-		optionsPanel.add(showDetails,c);
-		c.gridx = 0;
-		c.gridy = 2;
-		optionsPanel.add(print,c);
-		add(optionsPanel,BorderLayout.WEST);
+		
 		setVisible(true);
 		pack();
 	}
@@ -177,30 +183,31 @@ public class TextDocumentDisplay extends JFrame implements ActionListener, Mouse
         tp.replaceSelection(msg);
     }
 	@Override
-	public void actionPerformed(ActionEvent event) 
+	public void actionPerformed(ActionEvent e) 
 	{
-		
-		if(event.getSource()==showDetails)
+		if(e.getSource()==item1)
 		{
 			JOptionPane.showMessageDialog(this,getDetails()
 					, "File Details",JOptionPane.INFORMATION_MESSAGE);
 		}
-		else if(event.getSource()==print)
+		else if(e.getSource()==item2)
 		{
-			
-		
-			    try {
-					tPane.print();
-				} catch (PrinterException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+			printDocument();
 		}
-		
 		
 		
 	}
 	
+	private void printDocument() {
+
+	    try {
+			tPane.print();
+		} catch (PrinterException e) {
+			e.printStackTrace();
+		}
+	}
+
+
 	/**
 	 * Gets the text from the txt file
 	 */

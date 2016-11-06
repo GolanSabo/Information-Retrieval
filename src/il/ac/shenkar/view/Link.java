@@ -226,7 +226,7 @@ public class Link extends JPanel implements MouseListener
 			else if(fileDetails.getExtension().equals(".pdf"))
 			{
 				try {
-					PDFReader p = new PDFReader(getPath());
+					PDFReader p = new PDFReader(fileDetails,locations);
 					p.setVisible(true);
 				} catch (Exception e1) {
 					e1.getMessage();
